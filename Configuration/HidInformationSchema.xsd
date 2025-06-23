@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="HidInformationSchema"
+    targetNamespace="http://tempuri.org/HidInformationSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/HidInformationSchema.xsd"
+    xmlns:mstns="http://tempuri.org/HidInformationSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <!--
+  Sample Result:
+   "ok": true,
+    "result": {
+        "busy": false,
+        "connected": null,
+        "enabled": true,
+        "jiggler": {
+            "active": false,
+            "enabled": true,
+            "interval": 60
+        },
+        "keyboard": {
+            "leds": {
+                "caps": false,
+                "num": true,
+                "scroll": false
+            },
+            "online": true,
+            "outputs": {
+                "active": "",
+                "available": []
+            }
+        },
+        "mouse": {
+            "absolute": true,
+            "online": true,
+            "outputs": {
+                "active": "usb",
+                "available": [
+                    "usb",
+                    "usb_rel"
+                ]
+            }
+        },
+        "online": true
+    }
+  -->
+  <xs:simpleType name="StringListType">
+    <xs:list itemType="xs:string" />
+  </xs:simpleType>
+  
+  <xs:complexType name="JigglerType">
+    <xs:attribute name="active" type="xs:boolean" use="required" />
+    <xs:attribute name="interval" type="xs:integer" use="required" />
+    <xs:attribute name="enabled" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="KeyboardLedsType">
+    <xs:attribute name="caps" type="xs:boolean" use="required" />
+    <xs:attribute name="num" type="xs:boolean" use="required" />
+    <xs:attribute name="scroll" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="OutputsType">
+    <xs:attribute name="active" type="xs:string" use="required" />
+    <xs:attribute name="available" type="StringListType" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="KeyboardType">
+    <xs:all>
+      <xs:element name="leds" type="KeyboardLedsType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="outputs" type="OutputsType" />
+    </xs:all>
+    <xs:attribute name="online" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="MouseType">
+    <xs:all>
+      <xs:element name="outputs" type="OutputsType" />
+    </xs:all>
+    <xs:attribute name="absolute" type="xs:boolean" use="required" />
+    <xs:attribute name="online" type="xs:boolean" use="required" />
+  </xs:complexType>
+  
+  <xs:complexType name="HidInformationType">
+    <xs:all>
+      <xs:element name="jiggler" type="JigglerType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="keyboard" type="KeyboardType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="mouse" type="MouseType" minOccurs="0" maxOccurs="1" />
+    </xs:all>
+    <xs:attribute name="busy" type="xs:boolean" use="required" />
+    <xs:attribute name="connected" type="xs:boolean" use="optional" />
+    <xs:attribute name="enabled" type="xs:boolean" use="required" />
+    <xs:attribute name="online" type="xs:boolean" use="required" />
+  </xs:complexType>
+  
+  <xs:element name="HidInformation" type="HidInformationType" />
+</xs:schema>
