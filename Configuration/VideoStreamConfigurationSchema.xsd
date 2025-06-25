@@ -6,5 +6,82 @@
     xmlns:mstns="http://tempuri.org/VideoStreamConfigurationSchema.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
+  <!--
+  Connections
+  Connection
+  Name
+  BaseURI
+  Endpoints
+  Endpoint
+  #Vid
+  #HTP
+  #ws
   
+  
+  Video Stream Configuration Schema
+  ## UserNamePromptHeader
+  ## PasswordPromptHeader
+  ## PreferCookieAuthentication
+  ## Endpoint = api/media/ws
+  ## StartVideoStream_RequestMessage
+  ## FFmpeg Path
+  ## FFmpeg Arguments
+  ## GopSize
+  ## Bitrate
+  
+  ## Video_GenericLogEnabled
+  ## Video_WebSocketLogEnabled
+  ## Video_FFmpegLogEnabled
+  
+  ## WebSocketStream_TaskEnabled
+  ## FFmpegStreamOutput_TaskEnabled
+  ## FFmpegErrorStream_TaskEnabled
+  
+  
+  
+  API Websocket
+  ## UserNamePromptHeader
+  ## PasswordPromptHeader
+  ## PreferCookieAuthentication
+  ## Endpoint = api/ws?stream=0
+  ## EnumEmbeddedWsCommands
+  ## WSCOMMANDS
+  ## ## WSCOMMAND
+  ## ## ## Name
+  ## ## ## JsonTemplate
+  ## ## ## Parameters
+  ## ## ## ## Parameter
+  ## ## ## ## ## Name
+  ## ## ## ## ## ValueType
+    
+  ## API_GenericLogEnabled
+  ## API_WebSocketMessageLogEnabled
+  
+  
+  
+  HTTPClient
+  ## UserNamePromptHeader
+  ## PasswordPromptHeader
+  ## PreferCookieAuthentication
+  ## EnumEmbeddedHttpCommands
+  ## HttpEndpoints
+  ## ## HttpEndpoint
+  ## ## ## Name
+  ## ## ## Endpoint
+  ## ## ## HttpMethod
+  ## ## ## HttpHeaders
+  ## ## ## ## HttpHeader
+  ## ## ## ## ## Name
+  ## ## ## ## ## Value
+  ## ## ## Content
+  ## ## ## ## Name
+  ## ## ## ## Value
+  ## ## ## Querys
+  ## ## ## ## Query
+  ## ## ## ## ## Name
+  ## ## ## ## ## Value
+  
+  ## HTTP_GenericLogEnabled
+  ## HTTP_HttpLogEnabled
+  -->
 </xs:schema>

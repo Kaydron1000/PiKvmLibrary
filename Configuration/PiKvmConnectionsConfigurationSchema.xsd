@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="PiKvmConnectionsConfigurationSchema"
+    targetNamespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd"
+    elementFormDefault="unqualified"
+    xmlns="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd"
+    xmlns:mstns="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:element name="Connections" type="ConnectionsType" />
+
+  <xs:complexType name="ConnectionsType">
+    <xs:sequence>
+      <xs:element name="Connection" type="ConnectionType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="Version" type="xs:string" use="required" />
+    <xs:attribute name="DefaultUserNamePromptHeader" type="xs:string" use="required" />
+    <xs:attribute name="DefaultPasswordPromptHeader" type="xs:string" use="required" />
+    <xs:attribute name="DefaultPreferCookieAuthentication" type="xs:boolean" use="required" />
+  </xs:complexType>
+  
+  
+  
+  <xs:complexType name="ConnectionType">
+    <xs:all>
+      <xs:element name="Endpoints" type="EndpointsType" />
+    </xs:all>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="BaseURI" type="xs:anyURI" use="required" />
+    <xs:attribute name="UserNamePromptHeader" type="xs:string" use="optional" />
+    <xs:attribute name="PasswordPromptHeader" type="xs:string" use="optional" />
+    <xs:attribute name="PreferCookieAuthentication" type="xs:boolean" use="optional" />
+  </xs:complexType>
+
+
+  <xs:complexType name="EndpointsType">
+    <xs:sequence>
+      <xs:element name="Endpoint" type="EndpointType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EndpointType">
+    <xs:choice>
+      <xs:element name="Vid" type="xs:string" />
+      <xs:element name="HTP" type="xs:string" />
+      <xs:element name="ws" type="xs:string" />
+    </xs:choice>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="UserNamePromptHeader" type="xs:string" use="optional" />
+    <xs:attribute name="PasswordPromptHeader" type="xs:string" use="optional" />
+    <xs:attribute name="PreferCookieAuthentication" type="xs:boolean" use="optional" />
+  </xs:complexType>
+  
+  <xs:complexType name="VideoWebSocketType">
+    <xs:attribute name="Endpoint"                         type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegPath"                       type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegArguments"                  type="xs:string"  use="required" />
+    <xs:attribute name="StartVideoStream_RequestMessage"  type="xs:string"  use="required" />
+    <xs:attribute name="GopSize"                          type="xs:integer" use="required" />
+    <xs:attribute name="Bitrate"                          type="xs:integer" use="required" />
+    <xs:attribute name="Video_GenericLogEnabled"          type="xs:string"  use="required" />
+    <xs:attribute name="Video_WebSocketLogEnabled"        type="xs:string"  use="required" />
+    <xs:attribute name="Video_FFmpegLogEnabled"           type="xs:string"  use="required" />
+    <xs:attribute name="WebSocketStream_TaskEnabled"      type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegStreamOutput_TaskEnabled"   type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegErrorStream_TaskEnabled"    type="xs:string"  use="required" />
+  </xs:complexType>
+
+
+  <!--##############################################################-->
+  <xs:complexType name="APIWebSocketType">
+    <xs:all>
+      <xs:element name ="WSCommands"                      type="WebSocketCommandsType" minOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Endpoint"                         type="xs:string"  use="required" />
+    <xs:attribute name="API_GenericLogEnabled"            type="xs:boolean"  use="required" />
+    <xs:attribute name="API_WebSocketMessageLogEnabled"   type="xs:boolean"  use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="WebSocketCommandsType">
+    <xs:sequence>
+      <xs:element name="WsCommand"                        type="WebSocketCommandType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WebSocketCommandType">
+    <xs:all>
+      <xs:element name="Parameters" type="ParametersType" minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="JsonTemplate" type="xs:string" use="required"/>
+  </xs:complexType>
+  
+  <xs:complexType name="ParametersType">
+    <xs:sequence>
+      <xs:element name="Parameter" type="ParameterType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ParameterType">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="ValueType" type="xs:string" use="optional"/>
+  </xs:complexType>
+  
+  <!--##############################################################-->
+  <xs:complexType name="HTTPClientType">
+    <xs:all>
+      <xs:element name="HttpEndpoints" type="HttpEndpointsType" minOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="HTTP_GenericLogEnabled" type="xs:boolean" use="required"/>
+    <xs:attribute name="HTTP_HttpLogEnabled" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  
+  <xs:complexType name="HttpEndpointsType">
+    <xs:sequence>
+      <xs:element name="HttpEndpoint" type="HttpEndpointType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="HttpEndpointType">
+    <xs:all>
+      <xs:element name="HttpHeaders" type="HttpHeadersDictionaryType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Contents" type="ContentsDictionaryType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Querys" type="QuerysDictionaryType" minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Endpoint" type="xs:string" use="required"/>
+    <xs:attribute name="HttpMethod" type="xs:string" use="required"/>
+  </xs:complexType>
+  
+  <xs:complexType name="HttpHeadersDictionaryType">
+    <xs:sequence>
+      <xs:element name="HttpHeader" type="KeyValuePairType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ContentsDictionaryType">
+    <xs:sequence>
+      <xs:element name="Content" type="KeyValuePairType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="QuerysDictionaryType">
+    <xs:sequence>
+      <xs:element name="Query" type="KeyValuePairType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="KeyValuePairType">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Value" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  
+</xs:schema>

@@ -30,7 +30,7 @@ namespace PiKvmLibrary.Configuration
 
             };
             // Uncomment the line below when you implement the deserialization logic
-            var deserializedObject = JsonSerializer.Deserialize<json.Result>(json, options);
+            json.Result deserializedObject = JsonSerializer.Deserialize<json.Result>(json, options);
 
             return deserializedObject;
         }

@@ -63,6 +63,9 @@
     <None Include="Configuration\HidInformationSchema.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Configuration\PiKvmConnectionsConfigurationSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Configuration\VideoStreamConfigurationSchema.xsd">
       <SubType>Designer</SubType>
     </None>

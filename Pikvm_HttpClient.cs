@@ -19,15 +19,17 @@ namespace PiKvmLibrary
         private const string PASSWORD_PROMPT = "X-KVMD-Passwd";
         private const string URI_PATH = "https://192.168.1.183/";
 
+        private HttpClient _Client;
+        private HttpClientHandler _ClientHandler;
+        private CookieContainer _CookieContainer;
+
         private CancellationTokenSource _Cts_ReadingLog;
 
         public event EventHandler<LogMessage> OnLogEvent;
         public event EventHandler<LogMessage> OnHttpLogEvent;
-        private HttpClient _Client;
-        private HttpClientHandler _ClientHandler;
-        private CookieContainer _CookieContainer;  
 
-
+        private bool _IgnoreCerticateErrors;
+        public bool IgnoreCerticateErrors { get; set; }
 
         public Pikvm_HttpClient()
         {
@@ -42,6 +44,8 @@ namespace PiKvmLibrary
             _Client = new HttpClient(_ClientHandler);
             _Client.BaseAddress = new Uri(URI_PATH);
         }
+
+
 
         public void SetCredentials(string username, string password)
         {
@@ -74,7 +78,7 @@ namespace PiKvmLibrary
                 return true;
 
             // Log the errors or handle specific issues here
-            if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateNotAvailable))
+            if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateNotAvailable) && _IgnoreCerticateErrors)
                 return true; // Allow connections with no certificate
 
             return true; // Only allow connections with no errors
@@ -105,7 +109,7 @@ namespace PiKvmLibrary
         {
             try
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing POST request to /api/login", TimeStamp = DateTime.Now });
+                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing POST request to /api/auth/login", TimeStamp = DateTime.Now });
 
                 var content = new FormUrlEncodedContent(new[]
                 {
@@ -130,7 +134,7 @@ namespace PiKvmLibrary
                 username = null;
                 password = null; // Clear sensitive data
 
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Completed POST request to /api/login", TimeStamp = DateTime.Now });
+                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Completed POST request to /api/auth/login", TimeStamp = DateTime.Now });
             }
             catch (HttpRequestException e)
             {
