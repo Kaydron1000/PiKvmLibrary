@@ -35,7 +35,6 @@ namespace PiKvmLibrary
         {
             _Cts_Websocket = new CancellationTokenSource();
             _Cts_RecieveMessages = new CancellationTokenSource();
-            System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, errors) => true;
         }
         public GenericWebsocket(ConnectionType connectionConfiguration, EndpointType endPointConfiguration) : this()
         {

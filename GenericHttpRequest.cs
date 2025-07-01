@@ -41,7 +41,7 @@ namespace PiKvmLibrary
             _CookieContainer = new CookieContainer();
 
             _ClientHandler = new HttpClientHandler();
-            _ClientHandler.ServerCertificateCustomValidationCallback = ServerCertificateCustomValidationCallback_Handler;
+            //_ClientHandler.ServerCertificateCustomValidationCallback = ServerCertificateCustomValidationCallback_Handler;
             _ClientHandler.CookieContainer = _CookieContainer; // Use the CookieContainer to manage cookies
             _ClientHandler.UseCookies = true;
 

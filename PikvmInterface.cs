@@ -30,22 +30,28 @@ namespace PiKvmLibrary
         usb,
         usb_rel
     }
+    public class Resolution
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
     public class PikvmInterface
     {
         private ConfigurationData<PiKvmLibraryConfigurationType> _Configuration;
         private PiKvmLibraryConfigurationType _AppConfiguration;
         private ConnectionType _Connection;
-        private Configuration.json.Streamer.Resolution _Resolution;
+        private Resolution _Resolution;
         public Func<double, double> Rel_RemapX { get; set; }
         public Func<double, double> Rel_RemapY { get; set; }
         public Func<double, double> Abs_RemapX { get; set; }
         public Func<double, double> Abs_RemapY { get; set; }
         public PikvmInterface()
         {
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, errors) => true;
             _Configuration = new ConfigurationData<PiKvmLibraryConfigurationType>();
             _AppConfiguration = _Configuration.ApplicationConfiguration;
             _Connection = _AppConfiguration.Connections.Connection.First();
-            _Resolution = new Configuration.json.Streamer.Resolution
+            _Resolution = new Resolution
             {
                 Width = 1920,
                 Height = 1080
@@ -67,34 +73,34 @@ namespace PiKvmLibrary
         }
         public void SetResolution(int width, int height)
         {
-            _Resolution = new Configuration.json.Streamer.Resolution
+            _Resolution = new Resolution
             {
                 Width = width,
                 Height = height
             };
         }
-        private async Task<Configuration.json.Streamer.Result> GetStreamerInfo()
-        {
-            EndpointType streamerInfo_Endpoint = _Connection.GetEndpoint(StandardEndpointsEnumType.StreamerInformation_Endpoint);
-            if (streamerInfo_Endpoint.GetEndpointObject() is GenericHttpRequest httpRequest)
-            {
-                StringBuilder sb = new StringBuilder();
-                httpRequest.OnHttpMessageEvent += (sender, e) =>
-                {
-                    if (!String.IsNullOrEmpty(e))
-                    {
-                        sb.AppendLine(e);                        
-                    }
-                };
+        //private async Task<Configuration.json.Streamer.Result> GetStreamerInfo()
+        //{
+        //    EndpointType streamerInfo_Endpoint = _Connection.GetEndpoint(StandardEndpointsEnumType.StreamerInformation_Endpoint);
+        //    if (streamerInfo_Endpoint.GetEndpointObject() is GenericHttpRequest httpRequest)
+        //    {
+        //        StringBuilder sb = new StringBuilder();
+        //        httpRequest.OnHttpMessageEvent += (sender, e) =>
+        //        {
+        //            if (!String.IsNullOrEmpty(e))
+        //            {
+        //                sb.AppendLine(e);                        
+        //            }
+        //        };
 
-                await streamerInfo_Endpoint.SendEndpoint(parameters: null, onSuccess: (strg) => { }, onError: (strg) => { } );
-                string st = sb.ToString();
-                Configuration.json.Streamer.Root streamerInfo = StreamerInformationType.Deserialize(sb.ToString());
+        //        await streamerInfo_Endpoint.SendEndpoint(parameters: null, onSuccess: (strg) => { }, onError: (strg) => { } );
+        //        string st = sb.ToString();
+        //        Configuration.json.Streamer.Root streamerInfo = StreamerInformationType.Deserialize(sb.ToString());
 
-                return streamerInfo.Result;
-            }
-            return null;
-        }
+        //        return streamerInfo.Result;
+        //    }
+        //    return null;
+        //}
         public void SetMouseMode(MouseOutputType outputType)
         {
             EndpointType mouseType = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseOutputType_Endpoint);
