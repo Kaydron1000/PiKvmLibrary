@@ -7,19 +7,46 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
 
+  <xs:simpleType name="StandardEndpointsEnumType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Login_Endpoint"/>
+      <xs:enumeration value="HidInformation_Endpoint"/>
+      <xs:enumeration value="StreamerInformation_Endpoint"/>
+      <xs:enumeration value="MouseOutputType_Endpoint"/>
+      <xs:enumeration value="MouseOutputAbsolute_Endpoint"/>
+      <xs:enumeration value="MouseOutputRelative_Endpoint"/>
+      <xs:enumeration value="MouseMoveRelative_Endpoint"/>
+      <xs:enumeration value="MouseMoveAbsolute_Endpoint"/>
+      <xs:enumeration value="MouseButton_Endpoint"/>
+      <xs:enumeration value="H264_GOP_Endpoint"/>
+      <xs:enumeration value="H264_Bitrate_Endpoint"/>
+      <xs:enumeration value="API_Endpoint"/>
+      <xs:enumeration value="MediaStream_Endpoint"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  
+  <xs:element name="PiKvmLibraryConfiguration" type="PiKvmLibraryConfigurationType" />
   <xs:element name="Connections" type="ConnectionsType" />
+    
+  <xs:complexType name="PiKvmLibraryConfigurationType">
+    <xs:all>
+      <xs:element ref="Connections" minOccurs="1" maxOccurs="1" />
+      <xs:element name="ExampleEndpoints" type="StandardEndpointsEnumType" minOccurs="0" maxOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
 
   <xs:complexType name="ConnectionsType">
     <xs:sequence>
       <xs:element name="Connection" type="ConnectionType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="Version" type="xs:string" use="required" />
+    <xs:attribute name="EnableSingleQuoteJson" type="xs:boolean" use="required" />
     <xs:attribute name="DefaultUserNamePromptHeader" type="xs:string" use="required" />
     <xs:attribute name="DefaultPasswordPromptHeader" type="xs:string" use="required" />
     <xs:attribute name="DefaultPreferCookieAuthentication" type="xs:boolean" use="required" />
+    <xs:attribute name="DefaultIgnoreCertificateErrors" type="xs:boolean" use="required" />
   </xs:complexType>
-  
-  
   
   <xs:complexType name="ConnectionType">
     <xs:all>
@@ -30,6 +57,7 @@
     <xs:attribute name="UserNamePromptHeader" type="xs:string" use="optional" />
     <xs:attribute name="PasswordPromptHeader" type="xs:string" use="optional" />
     <xs:attribute name="PreferCookieAuthentication" type="xs:boolean" use="optional" />
+    <xs:attribute name="IgnoreCertificateErrors" type="xs:boolean" use="optional" />
   </xs:complexType>
 
 
@@ -41,14 +69,15 @@
 
   <xs:complexType name="EndpointType">
     <xs:choice>
-      <xs:element name="Vid" type="xs:string" />
-      <xs:element name="HTP" type="xs:string" />
-      <xs:element name="ws" type="xs:string" />
+      <xs:element name="HttpRequest" type="HttpEndpointType" />
+      <xs:element name="Websocket" type="WebSocketType" />
     </xs:choice>
     <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="EndpointTimeout_Sec" type="xs:double" use="required" />
     <xs:attribute name="UserNamePromptHeader" type="xs:string" use="optional" />
     <xs:attribute name="PasswordPromptHeader" type="xs:string" use="optional" />
     <xs:attribute name="PreferCookieAuthentication" type="xs:boolean" use="optional" />
+    <xs:attribute name="IgnoreCertificateErrors" type="xs:boolean" use="optional" />
   </xs:complexType>
   
   <xs:complexType name="VideoWebSocketType">
@@ -58,23 +87,52 @@
     <xs:attribute name="StartVideoStream_RequestMessage"  type="xs:string"  use="required" />
     <xs:attribute name="GopSize"                          type="xs:integer" use="required" />
     <xs:attribute name="Bitrate"                          type="xs:integer" use="required" />
-    <xs:attribute name="Video_GenericLogEnabled"          type="xs:string"  use="required" />
-    <xs:attribute name="Video_WebSocketLogEnabled"        type="xs:string"  use="required" />
-    <xs:attribute name="Video_FFmpegLogEnabled"           type="xs:string"  use="required" />
-    <xs:attribute name="WebSocketStream_TaskEnabled"      type="xs:string"  use="required" />
-    <xs:attribute name="FFmpegStreamOutput_TaskEnabled"   type="xs:string"  use="required" />
-    <xs:attribute name="FFmpegErrorStream_TaskEnabled"    type="xs:string"  use="required" />
+    <xs:attribute name="Video_GenericLogEnabled"          type="xs:boolean"  use="required" />
+    <xs:attribute name="Video_WebSocketLogEnabled"        type="xs:boolean"  use="required" />
+    <xs:attribute name="Video_FFmpegLogEnabled"           type="xs:boolean"  use="required" />
+    <xs:attribute name="WebSocketStream_TaskEnabled"      type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegStreamOutput_TaskEnabled"   type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegErrorStream_TaskEnabled"    type="xs:boolean"  use="required" />
   </xs:complexType>
 
 
   <!--##############################################################-->
-  <xs:complexType name="APIWebSocketType">
+  <xs:complexType name="WebSocketType">
     <xs:all>
-      <xs:element name ="WSCommands"                      type="WebSocketCommandsType" minOccurs="1"/>
+      <xs:element name="WSCommands"                       type="WebSocketCommandsType"  minOccurs="0"/>
+      <xs:element name="SettingCommands"                  type="SettingCommandsType"    minOccurs="0"/>
+      <xs:element name="PostProcessStream"                type="PostProcessStreamType"  minOccurs="0"/>
     </xs:all>
-    <xs:attribute name="Endpoint"                         type="xs:string"  use="required" />
-    <xs:attribute name="API_GenericLogEnabled"            type="xs:boolean"  use="required" />
-    <xs:attribute name="API_WebSocketMessageLogEnabled"   type="xs:boolean"  use="required" />
+    <xs:attribute name="Endpoint"                         type="xs:string"    use="required" />
+    <xs:attribute name="MessageLogEnabled"                type="xs:boolean"   use="required" />
+    <xs:attribute name="GenericLogEnabled"                type="xs:boolean"   use="required" />
+    <xs:attribute name="Stream_TaskEnabled"               type="xs:boolean"   use="required" />
+  </xs:complexType>
+  
+  <xs:complexType name="PostProcessStreamType">
+    <xs:choice>
+      <xs:element name="FFmpegConfiguration" type="FFmpegConfigurationType" minOccurs="1"/>
+    </xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="FFmpegConfigurationType">
+    <xs:attribute name="ApplicationPath"            type="xs:string"    use="required" />
+    <xs:attribute name="ApplicationArguments"       type="xs:string"    use="required" />
+    <xs:attribute name="OutputBufferSize"           type="xs:int"       use="required" />
+    <xs:attribute name="GenericLogEnabled"          type="xs:boolean"   use="required" />
+    <xs:attribute name="OuputLogEnabled"            type="xs:boolean"   use="required" />
+    <xs:attribute name="StreamOutput_TaskEnabled"   type="xs:boolean"   use="required" />
+    <xs:attribute name="ErrorStream_TaskEnabled"    type="xs:boolean"   use="required" />
+  </xs:complexType>
+  
+  <xs:complexType name="SettingCommandsType">
+    <xs:sequence>
+      <xs:element name="Command"                        type="SettingCommandType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+    
+  <xs:complexType name="SettingCommandType">
+    <xs:attribute name="EndpointName" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="WebSocketCommandsType">
@@ -103,7 +161,7 @@
   </xs:complexType>
   
   <!--##############################################################-->
-  <xs:complexType name="HTTPClientType">
+  <!--<xs:complexType name="HTTPClientType">
     <xs:all>
       <xs:element name="HttpEndpoints" type="HttpEndpointsType" minOccurs="1"/>
     </xs:all>
@@ -115,17 +173,33 @@
     <xs:sequence>
       <xs:element name="HttpEndpoint" type="HttpEndpointType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
-  </xs:complexType>
+  </xs:complexType>-->
+  
+  <xs:simpleType name="HttpRequestEnumType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GET"/>
+      <xs:enumeration value="POST"/>
+      <xs:enumeration value="PUT"/>
+      <xs:enumeration value="DELETE"/>
+      <xs:enumeration value="PATCH"/>
+      <xs:enumeration value="HEAD"/>
+      <xs:enumeration value="OPTIONS"/>
+    </xs:restriction>
+  </xs:simpleType>
   
   <xs:complexType name="HttpEndpointType">
     <xs:all>
       <xs:element name="HttpHeaders" type="HttpHeadersDictionaryType" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="Contents" type="ContentsDictionaryType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="Querys" type="QuerysDictionaryType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Contents" type="ContentsDictionaryType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Parameters" type="ParametersType" minOccurs="0" maxOccurs="1"/>
     </xs:all>
     <xs:attribute name="Name" type="xs:string" use="required"/>
     <xs:attribute name="Endpoint" type="xs:string" use="required"/>
-    <xs:attribute name="HttpMethod" type="xs:string" use="required"/>
+    <xs:attribute name="HttpMethod" type="HttpRequestEnumType" use="required"/>
+    <!--Possibly need response type if stream doesnt auto close on reg. response.-->
+    <xs:attribute name="HTTP_GenericLogEnabled" type="xs:boolean" use="required"/>
+    <xs:attribute name="HTTP_HttpLogEnabled" type="xs:boolean" use="required"/>
   </xs:complexType>
   
   <xs:complexType name="HttpHeadersDictionaryType">

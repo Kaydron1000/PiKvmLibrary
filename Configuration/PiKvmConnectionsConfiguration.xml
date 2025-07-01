@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ns:Connections DefaultPasswordPromptHeader="X-KVMD-Passwd" DefaultUserNamePromptHeader="X-KVMD-User" DefaultPreferCookieAuthentication="true" xmlns:ns="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd">
+  <Connection BaseURI="192.168.1.22" Name="Node1">
+    <Endpoints>
+      <Endpoint IgnoreCerticateErrors="true" Name="MOUSE">
+        <Video Endpoint="api\ws" Bitrate="1000"/>
+      </Endpoint>
+    </Endpoints>
+  </Connection>
+</ns:Connections>

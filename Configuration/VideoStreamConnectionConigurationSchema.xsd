@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="VideoStreamConnectionConigurationSchema"
+    targetNamespace="http://tempuri.org/VideoStreamConnectionConigurationSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/VideoStreamConnectionConigurationSchema.xsd"
+    xmlns:mstns="http://tempuri.org/VideoStreamConnectionConigurationSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:complexType name="VideoWebSocketType">
+    <xs:attribute name="Endpoint"                         type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegPath"                       type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegArguments"                  type="xs:string"  use="required" />
+    <xs:attribute name="StartVideoStream_RequestMessage"  type="xs:string"  use="required" />
+    <xs:attribute name="GopSize"                          type="xs:integer" use="required" />
+    <xs:attribute name="Bitrate"                          type="xs:integer" use="required" />
+    <xs:attribute name="Video_GenericLogEnabled"          type="xs:boolean"  use="required" />
+    <xs:attribute name="Video_WebSocketLogEnabled"        type="xs:boolean"  use="required" />
+    <xs:attribute name="Video_FFmpegLogEnabled"           type="xs:boolean"  use="required" />
+    <xs:attribute name="WebSocketStream_TaskEnabled"      type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegStreamOutput_TaskEnabled"   type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegErrorStream_TaskEnabled"    type="xs:boolean"  use="required" />
+  </xs:complexType>
+
+
+  <xs:complexType name="WebSocketType">
+    <xs:attribute name="Endpoint"                         type="xs:string"  use="required" />
+    <xs:attribute name="API_GenericLogEnabled"            type="xs:boolean"  use="required" />
+    <xs:attribute name="API_WebSocketMessageLogEnabled"   type="xs:boolean"  use="required" />
+    <xs:attribute name="WebSocketStream_TaskEnabled"      type="xs:boolean"  use="required" />
+  </xs:complexType>
+  
+
+  <xs:complexType name="FFmpegConfigurationType">
+    <xs:attribute name="FFmpegPath"                       type="xs:string"  use="required" />
+    <xs:attribute name="FFmpegArguments"                  type="xs:string"  use="required" />
+    <xs:attribute name="Video_FFmpegLogEnabled"           type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegStreamOutput_TaskEnabled"   type="xs:boolean"  use="required" />
+    <xs:attribute name="FFmpegErrorStream_TaskEnabled"    type="xs:boolean"  use="required" />
+  </xs:complexType>
+
+  <xs:element name="FFmpegConfiguration" type="FFmpegConfigurationType" />
+  <xs:element name="VideoStream" type="VideoWebSocketType" />
+</xs:schema>

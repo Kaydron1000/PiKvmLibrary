@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<z:PiKvmLibraryConfiguration xmlns:z="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd">
+  <z:Connections Version="0.0" DefaultIgnoreCertificateErrors="true" EnableSingleQuoteJson="true" DefaultPasswordPromptHeader="X-KVMD-Passwd" DefaultUserNamePromptHeader="X-KVMD-User" DefaultPreferCookieAuthentication="true">
+    <Connection BaseURI="https://192.168.1.183" Name="OriginalConnection">
+      <Endpoints>
+        <Endpoint Name="Login_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="Login" Endpoint="api/auth/login" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Contents>
+              <Content Name="user" Value="{USER}"/>
+              <Content Name="passwd" Value="{PASSWD}"/>
+            </Contents>
+            <Parameters>
+              <Parameter Name="USER" ValueType="string"/>
+              <Parameter Name="PASSWD" ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="HidInformation_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="HidInformation" Endpoint="api/hid" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="StreamerInformation_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="StreamerInformation" Endpoint="api/streamer" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseOutputType_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseOutput" Endpoint="api/hid/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="mouse_output" Value="{MOUSETYPE}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="MOUSETYPE" ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseOutputAbsolute_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseOutputAbsolute" Endpoint="api/hid/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="mouse_output" Value="usb"/>
+            </Querys>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseOutputRelative_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseOutputRelative" Endpoint="api/hid/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="mouse_output" Value="usb_rel"/>
+            </Querys>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseMoveRelative_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MousMoveRelative" Endpoint="api/hid/events/send_mouse_relative" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="delta_x" Value="{DELTA_X}"/>
+              <Query Name="delta_y" Value="{DELTA_Y}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="DELTA_X" ValueType="double"/>
+              <Parameter Name="DELTA_Y" ValueType="double"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseMoveAbsolute_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseMoveAbsolute" Endpoint="api/hid/events/send_mouse_move" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="to_x" Value="{TO_X}"/>
+              <Query Name="to_y" Value="{TO_Y}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="TO_X" ValueType="double"/>
+              <Parameter Name="TO_Y" ValueType="double"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="MouseButton_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseButton" Endpoint="api/hid/events/send_mouse_button" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="button" Value="{BUTTON}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="BUTTON" ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="H264_GOP_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="H264GOP" Endpoint="api/streamer/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="h264_gop" Value="{GOP}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="GOP" ValueType="int"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="H264_Bitrate_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="H264_Bitrate" Endpoint="api/streamer/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="h264_bitrate" Value="{BITRATE}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="BITRATE" ValueType="int"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="APIStream_Endpoint" EndpointTimeout_Sec="10">
+          <Websocket Endpoint="api/ws?stream=1" GenericLogEnabled="true" MessageLogEnabled="true" Stream_TaskEnabled="true">
+          </Websocket>
+        </Endpoint>
+        <Endpoint Name="API_Endpoint" EndpointTimeout_Sec="10">
+          <Websocket Endpoint="api/ws?stream=0" GenericLogEnabled="true" MessageLogEnabled="true" Stream_TaskEnabled="true">
+            <WSCommands>
+              <WsCommand Name="MouseMoveABS" JsonTemplate="{'event_type': 'mouse_move', 'event': {'to': {'x': {TOX}, 'y': {TOY}}}}">
+                <Parameters>
+                  <Parameter Name="TOX" ValueType="int"/>
+                  <Parameter Name="TOY" ValueType="int"/>
+                </Parameters>
+              </WsCommand>
+              <WsCommand Name="MouseMoveRelative" JsonTemplate="{'event_type': 'mouse_relative', 'event': {'delta': {'x': {TOX}, 'y': {TOY}}, 'squash': false}}">
+                <Parameters>
+                  <Parameter Name="TOX" ValueType="int"/>
+                  <Parameter Name="TOY" ValueType="int"/>
+                </Parameters>
+              </WsCommand>
+              <WsCommand Name="MouseButton" JsonTemplate="{'event_type': 'mouse_button', 'event': {'button': '{BUTTON}'}}">
+                <Parameters>
+                  <Parameter Name="BUTTON" ValueType="string"/>
+                </Parameters>
+              </WsCommand>
+              <WsCommand Name="KeyPress" JsonTemplate="{'event_type': 'key', 'event': {'key': '{KEY}', 'state': true, 'finish': true }}">
+                <Parameters>
+                  <Parameter Name="KEY" ValueType="string"/>
+                </Parameters>
+              </WsCommand>
+              <WsCommand Name="KeyState" JsonTemplate="{'event_type': 'key', 'event': {'key': '{KEY}', 'state': '{STATE}' }}">
+                <Parameters>
+                  <Parameter Name="KEY" ValueType="string"/>
+                  <Parameter Name="STATE" ValueType="string"/>
+                </Parameters>
+              </WsCommand>
+            </WSCommands>
+          </Websocket>
+        </Endpoint>
+        <Endpoint Name="MediaStream_Endpoint" EndpointTimeout_Sec="10">
+          <Websocket Endpoint="api/media/ws" GenericLogEnabled="true" MessageLogEnabled="true" Stream_TaskEnabled="true">
+            <WSCommands>
+              <WsCommand Name="StartStream" JsonTemplate="{'event_type': 'start', 'event': {'type': 'video', 'format': 'h264'}}"/>
+            </WSCommands>
+            <SettingCommands>
+              <Command EndpointName="H264_Bitrate_Endpoint"/>
+              <Command EndpointName="H264_GOP_Endpoint"/>
+            </SettingCommands>
+            <PostProcessStream>
+              <FFmpegConfiguration ApplicationPath="C:\ffmpeg\ffmpeg-7.1.1-full_build-shared\ffmpeg-7.1.1-full_build-shared\bin\ffmpeg.exe"
+                                   ApplicationArguments="-f h264 -i pipe:0 -vf fps=10 -f image2pipe -vcodec mjpeg pipe:1"
+                                   GenericLogEnabled="true"
+                                   OutputBufferSize="4096"
+                                   OuputLogEnabled="true"
+                                   ErrorStream_TaskEnabled="true"
+                                   StreamOutput_TaskEnabled="true"/>
+            </PostProcessStream>
+          </Websocket>
+        </Endpoint>
+      </Endpoints>
+    </Connection>
+  </z:Connections>
+</z:PiKvmLibraryConfiguration>

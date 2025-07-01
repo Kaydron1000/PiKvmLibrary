@@ -12,22 +12,6 @@ using System.Windows.Threading;
 
 namespace PiKvmLibrary
 {
-    public enum LogLevel
-    {
-        None,
-        Verbose,
-        Debug,
-        Information,
-        Warning,
-        Error,
-        Fatal
-    }
-    public struct LogMessage
-    {
-        public LogLevel LogLevel { get; set; }
-        public string Message { get; set; }
-        public DateTime TimeStamp { get; set; }
-    }
     public class Pikvm_Apiws
     {
         private static Dictionary<Key, string> keyValuePairs;

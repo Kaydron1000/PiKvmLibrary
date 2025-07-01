@@ -10,7 +10,7 @@ namespace PiKvmLibrary.Configuration
 {
     public partial class HidInformationType
     {
-        public static json.Result Deserialize (string json)
+        public static json.Hid.Result Deserialize (string json)
         {
             // Implement deserialization logic here
             // This is a placeholder for the actual implementation
@@ -30,13 +30,13 @@ namespace PiKvmLibrary.Configuration
 
             };
             // Uncomment the line below when you implement the deserialization logic
-            json.Result deserializedObject = JsonSerializer.Deserialize<json.Result>(json, options);
+            json.Hid.Result deserializedObject = JsonSerializer.Deserialize<json.Hid.Result>(json, options);
 
             return deserializedObject;
         }
     }
 }
-namespace PiKvmLibrary.Configuration.json
+namespace PiKvmLibrary.Configuration.json.Hid
 {
     public class Result
     {

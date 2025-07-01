@@ -48,11 +48,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Configuration\ConfigurationData.cs" />
     <Compile Include="Configuration\HidInformationSchema.cs">
       <DependentUpon>HidInformationSchema.xsd</DependentUpon>
     </Compile>
     <Compile Include="Configuration\HidinformationSchema_Extended.cs" />
+    <Compile Include="Configuration\PiKvmConnectionsConfigurationSchema.cs">
+      <DependentUpon>PiKvmConnectionsConfigurationSchema.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Configuration\PiKvmConnectionsConfigurationSchema_Extended.cs" />
+    <Compile Include="Configuration\StreamerInformationSchema.cs">
+      <DependentUpon>StreamerInformationSchema.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Configuration\StreamerInformationSchema_Extended.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="FfmpegProcessor.cs" />
+    <Compile Include="GenericHttpRequest.cs" />
+    <Compile Include="GenericWebsocket.cs" />
+    <Compile Include="IPostProcessStream.cs" />
+    <Compile Include="LogLevel.cs" />
+    <Compile Include="LogMessage.cs" />
     <Compile Include="PikvmInterface.cs" />
     <Compile Include="Pikvm_ApiVideoStream.cs" />
     <Compile Include="Pikvm_Apiws.cs" />
@@ -63,12 +78,21 @@
     <None Include="Configuration\HidInformationSchema.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Configuration\PiKvmConnectionsConfigurationSchema.xsd">
+    <EmbeddedResource Include="Configuration\PiKvmConnectionsConfigurationSchema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Configuration\StreamerInformationSchema.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Configuration\VideoStreamConfigurationSchema.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Configuration\VideoStreamConnectionConigurationSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\PiKvmApiCommandsConfiguration.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

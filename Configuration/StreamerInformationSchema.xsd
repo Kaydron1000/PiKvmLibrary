@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="StreamerInformationSchema"
+    targetNamespace="http://tempuri.org/StreamerInformationSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/StreamerInformationSchema.xsd"
+    xmlns:mstns="http://tempuri.org/StreamerInformationSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:complexType name="ResultType">
+    <xs:all>
+      <xs:element name="features" type="FeaturesType"/>
+      <xs:element name="limits" type="LimitsType"/>
+      <xs:element name="params" type="ParamsType"/>
+      <xs:element name="snapshot" type="SnapshotType"/>
+      <xs:element name="streamer" type="StreamerType"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="FeaturesType">
+    <xs:all>
+      <xs:element name="h264" type="xs:boolean"/>
+      <xs:element name="quality" type="xs:boolean"/>
+      <xs:element name="resolution" type="xs:boolean"/>
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="LimitsType">
+    <xs:all>
+      <xs:element name="desired_fps" type="RangeType"/>
+      <xs:element name="h264_bitrate" type="RangeType"/>
+      <xs:element name="h264_gop" type="RangeType"/>
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="RangeType">
+    <xs:all>
+      <xs:element name="min" type="xs:integer"/>
+      <xs:element name="max" type="xs:integer"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ParamsType">
+    <xs:all>
+      <xs:element name="desired_fps" type="xs:integer"/>
+      <xs:element name="h264_bitrate" type="xs:integer"/>
+      <xs:element name="h264_gop" type="xs:integer"/>
+      <xs:element name="quality" type="xs:integer"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="SnapshotType">
+    <xs:all>
+      <xs:element name="saved" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="StreamerType">
+    <xs:all>
+      <xs:element name="instance_id" type="xs:string"/>
+      <xs:element name="drm" type="DrmType"/>
+      <xs:element name="encoder" type="EncoderType"/>
+      <xs:element name="h264" type="H264Type"/>
+      <xs:element name="sinks" type="SinksType"/>
+      <xs:element name="source" type="SourceType"/>
+      <xs:element name="stream" type="StreamType"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="DrmType">
+    <xs:all>
+      <xs:element name="fps" type="xs:integer"/>
+      <xs:element name="live" type="xs:boolean"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="EncoderType">
+    <xs:all>
+      <xs:element name="quality" type="xs:integer"/>
+      <xs:element name="type" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="H264Type">
+    <xs:all>
+      <xs:element name="bitrate" type="xs:integer"/>
+      <xs:element name="fps" type="xs:integer"/>
+      <xs:element name="gop" type="xs:integer"/>
+      <xs:element name="online" type="xs:boolean"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="SinksType">
+    <xs:all>
+      <xs:element name="h264" type="SinkType"/>
+      <xs:element name="jpeg" type="SinkType"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="SinkType">
+    <xs:all>
+      <xs:element name="has_clients" type="xs:boolean"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="SourceType">
+    <xs:all>
+      <xs:element name="captured_fps" type="xs:integer"/>
+      <xs:element name="desired_fps" type="xs:integer"/>
+      <xs:element name="online" type="xs:boolean"/>
+      <xs:element name="resolution" type="ResolutionType"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ResolutionType">
+    <xs:all>
+      <xs:element name="width" type="xs:integer"/>
+      <xs:element name="height" type="xs:integer"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="StreamType">
+    <xs:all>
+      <xs:element name="clients" type="xs:integer"/>
+      <xs:element name="clients_stat" type="ClientsStatType"/>
+      <xs:element name="queued_fps" type="xs:integer"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ClientsStatType">
+    <xs:attribute name="client_id" type="xs:string" use="optional"/>
+    <xs:attribute name="fps" type="xs:integer" use="optional"/>
+    <xs:attribute name="bitrate" type="xs:integer" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="StreamerInformationType">
+    <xs:all>
+      <xs:element name="result" type="ResultType"/>
+    </xs:all>
+    <xs:attribute name="ok" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  
+  <xs:element name="StreamerInformation" type="StreamerInformationType"/>
+  <!--
+  {
+    "ok": true,
+    "result": {
+        "features": {
+            "h264": true,
+            "quality": true,
+            "resolution": false
+        },
+        "limits": {
+            "desired_fps": {
+                "max": 70,
+                "min": 0
+            },
+            "h264_bitrate": {
+                "max": 20000,
+                "min": 25
+            },
+            "h264_gop": {
+                "max": 60,
+                "min": 0
+            }
+        },
+        "params": {
+            "desired_fps": 40,
+            "h264_bitrate": 15000,
+            "h264_gop": 30,
+            "quality": 80
+        },
+        "snapshot": {
+            "saved": null
+        },
+        "streamer": {
+            "drm": {
+                "fps": 0,
+                "live": false
+            },
+            "encoder": {
+                "quality": 80,
+                "type": "CPU"
+            },
+            "h264": {
+                "bitrate": 15000,
+                "fps": 30,
+                "gop": 30,
+                "online": true
+            },
+            "instance_id": "",
+            "sinks": {
+                "h264": {
+                    "has_clients": true
+                },
+                "jpeg": {
+                    "has_clients": false
+                }
+            },
+            "source": {
+                "captured_fps": 60,
+                "desired_fps": 40,
+                "online": true,
+                "resolution": {
+                    "height": 1080,
+                    "width": 1920
+                }
+            },
+            "stream": {
+                "clients": 0,
+                "clients_stat": {},
+                "queued_fps": 0
+            }
+        }
+    }
+}
+  -->
+</xs:schema>
