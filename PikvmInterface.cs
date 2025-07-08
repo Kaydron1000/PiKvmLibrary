@@ -41,6 +41,8 @@ namespace PiKvmLibrary
         private PiKvmLibraryConfigurationType _AppConfiguration;
         private ConnectionType _Connection;
         private Resolution _Resolution;
+        public EventHandler<string> OnHttpMessageEvent;
+        public EventHandler<LogMessage> OnLogEvent;
         public Func<double, double> Rel_RemapX { get; set; }
         public Func<double, double> Rel_RemapY { get; set; }
         public Func<double, double> Abs_RemapX { get; set; }
@@ -65,9 +67,24 @@ namespace PiKvmLibrary
         {
             _Connection.BaseURI = uri;
             _Connection.InitializeEndpoints();
+            var endPoints = _Connection.Endpoints.Where(o => o.GetEndpointObject() is GenericHttpRequest).Select(o => o.GetEndpointObject() as GenericHttpRequest);
+            endPoints.ToList().ForEach(o =>
+            {
+                o.OnHttpMessageEvent += (sender, e) =>
+                {
+                    if (!String.IsNullOrEmpty(e))
+                    {
+                        OnHttpMessageEvent?.Invoke(sender, e);
+                    }
+                };
+                o.OnLogEvent += (sender, e) =>
+                {
+                    OnLogEvent?.Invoke(sender, e);
+                };
+            });
 
             EndpointType login = _Connection.GetEndpoint(StandardEndpointsEnumType.Login_Endpoint);
-            login.SendEndpoint(new object[] { username, password }).ConfigureAwait(false).GetAwaiter().GetResult();
+            login.SendEndpoint(new object[] { username, password }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
 
             _Connection.SetCredentials(login);
         }
@@ -104,7 +121,7 @@ namespace PiKvmLibrary
         public void SetMouseMode(MouseOutputType outputType)
         {
             EndpointType mouseType = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseOutputType_Endpoint);
-            mouseType.SendEndpoint(new object[] { outputType.ToString() }).ConfigureAwait(false).GetAwaiter().GetResult();
+            mouseType.SendEndpoint(new object[] { outputType.ToString() }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public void MoveMouse(MouseMode mouseMode, int xPos, int yPos)
         {
@@ -118,14 +135,14 @@ namespace PiKvmLibrary
                 EndpointType mouseMove_abs = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseMoveAbsolute_Endpoint);
                 double x = Abs_RemapX(xPos);
                 double y = Abs_RemapX(yPos);
-                mouseMove_abs.SendEndpoint(new object[] { x, y }).ConfigureAwait(false).GetAwaiter().GetResult();
+                mouseMove_abs.SendEndpoint(new object[] { x, y }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             else if (mouseMode == MouseMode.Relative)
             {
                 EndpointType mouseMove_rel = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseMoveRelative_Endpoint);
                 double x = Rel_RemapX(xPos);
                 double y = Rel_RemapX(yPos);
-                mouseMove_rel.SendEndpoint(new object[] { x, y }).ConfigureAwait(false).GetAwaiter().GetResult();
+                mouseMove_rel.SendEndpoint(new object[] { x, y }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                 // Convert point to relative coordinates
             }
             else
@@ -137,7 +154,7 @@ namespace PiKvmLibrary
         public void MouseClick(MouseButton mouseButton)
         {
             EndpointType MouseButton = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseButton_Endpoint);
-            MouseButton.SendEndpoint(new[] { mouseButton.ToString() }).ConfigureAwait(false).GetAwaiter().GetResult();
+            MouseButton.SendEndpoint(new[] { mouseButton.ToString() }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         private double Remap(double value, double in_min, double in_max, double out_min, double out_max)
         {
@@ -156,6 +173,14 @@ namespace PiKvmLibrary
             double outMove = (screenPrecentMove * outRange) + out_min; // Calculate the output move based on the input move percentage
             double rslt = Math.Round(outMove);
             return (int)rslt;
+        }
+        private void OnHttpMessage(string message)
+        {
+            OnHttpMessageEvent?.Invoke(this, message);
+        }
+        private void OnLogMessage(LogMessage logMessage)
+        {
+            OnLogEvent?.Invoke(this, logMessage);
         }
     }
 }

@@ -180,46 +180,44 @@ namespace PiKvmLibrary
             }
             _Client.DefaultRequestHeaders.Add(name, value);
         }
-        public async Task GetResponseAsync(string url, Action<string> onSuccess = null, Action<Exception> onError = null)
+        public async Task GetResponseAsync(string url, Action<string> onHttpMessage = null, Action<LogMessage> onLog = null)
         {
             try
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing Get request to {url} ", TimeStamp = DateTime.Now });
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing Get request to {url} ", TimeStamp = DateTime.Now });
 
                 Task<HttpResponseMessage> tsk = _Client.GetAsync(url);
 
-                await ReadResult(tsk.Result, onSuccess, onError);
+                await ReadResult(tsk.Result, onHttpMessage, onLog);
             }
             catch (Exception ex)
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Exception during Get request to {url}", TimeStamp = DateTime.Now });
-                onError?.Invoke(ex);
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Exception during Get request to {url}", TimeStamp = DateTime.Now });
             }
         }
 
-        public async Task PostRequestAsync(string url, HttpContent content, Action<string> onSuccess = null, Action<Exception> onError = null)
+        public async Task PostRequestAsync(string url, HttpContent content, Action<string> onHttpMessage = null, Action<LogMessage> onLog = null)
         {
             try
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing Post request to {url} ", TimeStamp = DateTime.Now });
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Debug, Message = $"Initializing Post request to {url} ", TimeStamp = DateTime.Now });
 
                 Task<HttpResponseMessage> tsk = _Client.PostAsync(url, content);
 
-                await ReadResult(tsk.Result, onSuccess, onError);
+                await ReadResult(tsk.Result, onHttpMessage, onLog);
             }
             catch (Exception ex)
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Exception during Post request to {url}", TimeStamp = DateTime.Now });
-                onError?.Invoke(ex);
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Exception during Post request to {url}", TimeStamp = DateTime.Now });
             }
         }
 
-        private async Task ReadResult(HttpResponseMessage response, Action<string> onSuccess, Action<Exception> onError)
+        private async Task ReadResult(HttpResponseMessage response, Action<string> onHttpMessage, Action<LogMessage> onLog)
         {
             try
             {
                 response.EnsureSuccessStatusCode();
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Information, Message = $"{response.RequestMessage.Method.Method} request to {response.RequestMessage.RequestUri} completed successfully", TimeStamp = DateTime.Now });
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Information, Message = $"{response.RequestMessage.Method.Method} request to {response.RequestMessage.RequestUri} completed successfully", TimeStamp = DateTime.Now });
                 
                 using (Stream stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult())
                 using (StreamReader reader = new StreamReader(stream))
@@ -233,7 +231,7 @@ namespace PiKvmLibrary
                         if (cnta > 0)
                         {
                             line = new string(buffer, 0, cnta);
-                            PushHttpMessageEvent(line);
+                            onHttpMessage?.Invoke(line);
                         }
                     } while (cnta > 0 && response.StatusCode == HttpStatusCode.OK);
                     //string lin = await reader.ReadAsync();
@@ -252,10 +250,8 @@ namespace PiKvmLibrary
             }
             catch (Exception ex)
             {
-                PushLogEvent(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Error reading {response.RequestMessage.Method.Method} response from {response.RequestMessage.RequestUri}.", TimeStamp = DateTime.Now });
-                onError?.Invoke(ex);
+                onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Error reading {response.RequestMessage.Method.Method} response from {response.RequestMessage.RequestUri}.", TimeStamp = DateTime.Now });
             }
-            onSuccess?.Invoke("");
         }
 
         private void PushLogEvent(LogMessage logMessage)

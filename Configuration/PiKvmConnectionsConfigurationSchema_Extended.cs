@@ -133,7 +133,7 @@ namespace PiKvmLibrary.Configuration
                 throw new NotSupportedException($"Unsupported endpoint type: {Item.GetType().Name}");
             }
         }
-        public async Task SendEndpoint(object[] parameters, Action<string> onSuccess = null, Action<Exception> onError = null)
+        public async Task SendEndpoint(object[] parameters, Action<string> onHttpMessage = null, Action<LogMessage> onLog = null)
         {
             if (Item is HttpEndpointType httpRequest)
             {
@@ -251,12 +251,12 @@ namespace PiKvmLibrary.Configuration
 
                 if (httpRequest.HttpMethod == HttpRequestEnumType.GET)
                 {
-                    _HttpEndpiontObject.GetResponseAsync(endpoint, onSuccess, onError).Wait();
+                    _HttpEndpiontObject.GetResponseAsync(endpoint, onHttpMessage, onLog).Wait();
                 }
                 else if (httpRequest.HttpMethod == HttpRequestEnumType.POST)
                 {
 
-                    _HttpEndpiontObject.PostRequestAsync(endpoint, contents, onSuccess, onError).Wait();
+                    _HttpEndpiontObject.PostRequestAsync(endpoint, contents, onHttpMessage, onLog).Wait();
                 }
                 else
                 {
