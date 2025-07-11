@@ -81,6 +81,18 @@
             </Parameters>
           </HttpRequest>
         </Endpoint>
+        <Endpoint Name="MouseButtonState_Endpoint" EndpointTimeout_Sec="10">
+          <HttpRequest Name="MouseButtonState" Endpoint="api/hid/events/send_mouse_button" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="button" Value="{BUTTON}"/>
+              <Query Name="state" Value="{STATE}"/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="BUTTON" ValueType="string"/>
+              <Parameter Name="STATE" ValueType="bool"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
         <Endpoint Name="H264_GOP_Endpoint" EndpointTimeout_Sec="10">
           <HttpRequest Name="H264GOP" Endpoint="api/streamer/set_params" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
             <Querys>

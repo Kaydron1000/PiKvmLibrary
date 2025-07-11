@@ -95,4 +95,11 @@
     <EmbeddedResource Include="Configuration\PiKvmApiCommandsConfiguration.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xsd "$(ProjectDir)Configuration\PiKvmConnectionsConfigurationSchema.xsd" /c /n:PiKvmLibrary.Configuration  /o:"$(ProjectDir)Configuration"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

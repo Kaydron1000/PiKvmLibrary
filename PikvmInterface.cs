@@ -96,6 +96,18 @@ namespace PiKvmLibrary
                 Height = height
             };
         }
+        public void GenericRequest(string requestName, object[] parameters = null)
+        {
+            EndpointType endpoint = _Connection.GetCommand_HttpType(requestName);
+            if (endpoint != null)
+            {
+                endpoint.SendEndpoint(parameters, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            else
+            {
+                throw new ArgumentException($"Endpoint '{requestName}' not found.");
+            }
+        }
         //private async Task<Configuration.json.Streamer.Result> GetStreamerInfo()
         //{
         //    EndpointType streamerInfo_Endpoint = _Connection.GetEndpoint(StandardEndpointsEnumType.StreamerInformation_Endpoint);
@@ -118,6 +130,7 @@ namespace PiKvmLibrary
         //    }
         //    return null;
         //}
+
         public void SetMouseMode(MouseOutputType outputType)
         {
             EndpointType mouseType = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseOutputType_Endpoint);
@@ -153,8 +166,15 @@ namespace PiKvmLibrary
         }
         public void MouseClick(MouseButton mouseButton)
         {
-            EndpointType MouseButton = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseButton_Endpoint);
+            EndpointType MouseButton;
+            MouseButton = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseButton_Endpoint);
             MouseButton.SendEndpoint(new[] { mouseButton.ToString() }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        public void MouseClickState(MouseButton mouseButton, bool state)
+        {
+            EndpointType MouseButton;
+            MouseButton = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseButtonState_Endpoint);
+            MouseButton.SendEndpoint(new object[] { mouseButton.ToString(), state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         private double Remap(double value, double in_min, double in_max, double out_min, double out_max)
         {

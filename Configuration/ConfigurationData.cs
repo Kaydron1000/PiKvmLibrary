@@ -10,6 +10,8 @@ using System.Xml.Linq;
 using System.Reflection;
 using System.IO;
 using System.CodeDom;
+using System.Runtime;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace PiKvmLibrary.Configuration
 {
@@ -47,8 +49,24 @@ namespace PiKvmLibrary.Configuration
                 };
                 settings.ValidationEventHandler += ValidationCallback;
 
-
-
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                DirectoryInfo di = new DirectoryInfo(Path.GetDirectoryName(assembly.Location));
+                if (!TryImportXmlFile(new FileInfo(Path.Combine(di.FullName, xmlName)), settings))
+                    if (!TryImportXmlFromEmbeddedResource(xmlName, settings))
+                        throw new Exception($"Could not find embedded XML resource: {xmlName}");
+            }
+            catch
+            {
+                throw new Exception("Could not load XML configuration document.");
+            }
+            if (_ApplicationConfiguration == null)
+                throw new Exception("Failed to deserialize XML configuration document.");
+            return true;
+        }
+        private bool TryImportXmlFromEmbeddedResource(string xmlName, XmlReaderSettings settings)
+        {
+            try
+            {
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 string[] resourceNames = assembly.GetManifestResourceNames();
 
@@ -70,12 +88,13 @@ namespace PiKvmLibrary.Configuration
                     return true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Could not load XML configuration document.");
+
             }
+            return false;
         }
-        private bool ImportXml(FileInfo xmlFileInfo)
+        private bool TryImportXmlFile(FileInfo xmlFileInfo, XmlReaderSettings settings)
         {
             if (xmlFileInfo == null || !xmlFileInfo.Exists)
             {
@@ -95,17 +114,6 @@ namespace PiKvmLibrary.Configuration
             }
             try
             {
-                XmlReaderSettings settings = new XmlReaderSettings
-                {
-                    ValidationType = ValidationType.Schema,
-                    Schemas = _SchemaSet,
-                    IgnoreWhitespace = true,
-                    IgnoreComments = true,
-                    CloseInput = true,
-                    ConformanceLevel = ConformanceLevel.Auto
-                };
-                settings.ValidationEventHandler += ValidationCallback;
-
                 XmlSerializer serializer = new XmlSerializer(typeof(T));
                 using (XmlReader reader = XmlReader.Create(xmlFileInfo.FullName, settings))
                 {
@@ -146,7 +154,7 @@ namespace PiKvmLibrary.Configuration
         {
             try
             {
-                schemaSet.Add(targetNamespace, schemaUrl);
+                XmlSchema loadedSchema = schemaSet.Add(targetNamespace, schemaUrl);
                 return true;
             }
             catch

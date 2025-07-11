@@ -18,6 +18,7 @@
       <xs:enumeration value="MouseMoveRelative_Endpoint"/>
       <xs:enumeration value="MouseMoveAbsolute_Endpoint"/>
       <xs:enumeration value="MouseButton_Endpoint"/>
+      <xs:enumeration value="MouseButtonState_Endpoint"/>
       <xs:enumeration value="H264_GOP_Endpoint"/>
       <xs:enumeration value="H264_Bitrate_Endpoint"/>
       <xs:enumeration value="API_Endpoint"/>

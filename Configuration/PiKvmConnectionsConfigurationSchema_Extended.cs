@@ -12,11 +12,24 @@ using System.Security.Cryptography;
 using System.Windows.Media.Animation;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace PiKvmLibrary.Configuration
 {
     public partial class ConnectionType
     {
+        private Dictionary<string, EndpointType> _Commands;
+
+        private Dictionary<string, EndpointType> Commands
+        {
+            get
+            {
+                if (_Commands == null)
+                    _Commands = GetAllConnectionCommands();
+
+                return _Commands;
+            }
+        }
         public void InitializeEndpoints()
         {
             if (Endpoints != null && Endpoints.Length > 0)
@@ -93,6 +106,28 @@ namespace PiKvmLibrary.Configuration
 
             return Endpoints.FirstOrDefault(e => e.Name == endpointType.ToString());
         }
+        public EndpointType GetCommand(StandardEndpointsEnumType endpointType)
+        {
+            if (Endpoints == null || Endpoints.Length == 0)
+                throw new NotSupportedException($"No endpoints are defined.");
+
+            return Endpoints.FirstOrDefault(e => e.Item == endpointType.ToString());
+        }
+        public EndpointType GetCommand_HttpType(string endpointCommandName)
+        {
+            if (Endpoints == null || Endpoints.Length == 0)
+                throw new NotSupportedException($"No endpoints are defined.");
+
+            EndpointType endpoint = null;
+            if (Commands.ContainsKey(endpointCommandName))
+                return endpoint = Commands[endpointCommandName];
+
+            return null;
+        }
+        private Dictionary<string, EndpointType> GetAllConnectionCommands()
+        {
+            return Endpoints.Where(o => o.Item is HttpEndpointType).ToDictionary(o => (o.Item as HttpEndpointType).Name, o => o);
+        }
     }
     public partial class EndpointType
     {
@@ -141,12 +176,11 @@ namespace PiKvmLibrary.Configuration
                     throw new NotSupportedException($"Endpoint is not initialized.");
 
                 Dictionary<string, Type> parameterRequestType;
-                Dictionary<string, string> parameterValues = new Dictionary<string, string>(); ;
+                Dictionary<string, string> parameterValues = new Dictionary<string, string>();
 
                 if (httpRequest.Parameters != null)
                 {
                     parameterRequestType = httpRequest.Parameters.ToDictionary(kvp => kvp.Name, kvp => TypeSelector(kvp));
-
 
                     // Validation parameters count are the same
                     if (httpRequest.Parameters.Length != parameters.Length)
@@ -169,15 +203,15 @@ namespace PiKvmLibrary.Configuration
                             }
                             else
                             {
-                                if (expectedType == parameter.GetType())
+                                if (expectedType == (parameter.GetType()))
                                     parameter = parameter; // already correct type
-                                else if (expectedType == typeof(int) && parameter is string strInt && int.TryParse(strInt, out int intValue))
+                                else if (expectedType == typeof(int) && int.TryParse(parameter.ToString(), out int intValue))
                                     parameter = intValue;
-                                else if (expectedType == typeof(float) && parameter is string strFloat && float.TryParse(strFloat, out float floatValue))
+                                else if (expectedType == typeof(float) && float.TryParse(parameter.ToString(), out float floatValue))
                                     parameter = floatValue;
-                                else if (expectedType == typeof(double) && parameter is string strDouble && double.TryParse(strDouble, out double doubleValue))
+                                else if (expectedType == typeof(double) && double.TryParse(parameter.ToString(), out double doubleValue))
                                     parameter = doubleValue;
-                                else if (expectedType == typeof(bool) && parameter is string strBool && bool.TryParse(strBool, out bool boolValue))
+                                else if (expectedType == typeof(bool) && bool.TryParse(parameter.ToString(), out bool boolValue))
                                     parameter = boolValue;
                                 else
                                     throw new InvalidCastException($"Parameter '{httpParam.Name}' does not match expected type '{expectedType.Name}' for value '{parameter}'.");
@@ -294,6 +328,8 @@ namespace PiKvmLibrary.Configuration
             else if (parameter.ValueType.ToLower() == "single")
                 return typeof(float);
             else if (parameter.ValueType.ToLower() == "bool")
+                return typeof(bool);
+            else if (parameter.ValueType.ToLower() == "boolean")
                 return typeof(bool);
             else if (parameter.ValueType.ToLower() == "double")
                 return typeof(double);
