@@ -96,7 +96,7 @@ namespace PiKvmLibrary.Configuration
         }
         private bool TryImportXmlFile(FileInfo xmlFileInfo, XmlReaderSettings settings)
         {
-            if (xmlFileInfo == null || !xmlFileInfo.Exists)
+            if (!(xmlFileInfo != null && xmlFileInfo.Exists))
             {
                 //_ImportLogger?.Error("XML file does not exist: {FileName}", xmlFileInfo?.FullName);
                 return false;
