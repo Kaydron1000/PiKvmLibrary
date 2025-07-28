@@ -10,6 +10,10 @@
   <xs:simpleType name="StandardEndpointsEnumType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Login_Endpoint"/>
+      <xs:enumeration value="Info_Endpoint"/>
+      <xs:enumeration value="PrintText_Endpoint"/>
+      <xs:enumeration value="SendKeyboardKey_Endpoint"/>
+      <xs:enumeration value="SendKeyboardMultiKeyPress_Endpoint"/>
       <xs:enumeration value="HidInformation_Endpoint"/>
       <xs:enumeration value="StreamerInformation_Endpoint"/>
       <xs:enumeration value="MouseOutputType_Endpoint"/>
@@ -22,7 +26,6 @@
       <xs:enumeration value="H264_GOP_Endpoint"/>
       <xs:enumeration value="H264_Bitrate_Endpoint"/>
       <xs:enumeration value="API_Endpoint"/>
-      <xs:enumeration value="MediaStream_Endpoint"/>
     </xs:restriction>
   </xs:simpleType>
   
@@ -79,6 +82,7 @@
     <xs:attribute name="PasswordPromptHeader" type="xs:string" use="optional" />
     <xs:attribute name="PreferCookieAuthentication" type="xs:boolean" use="optional" />
     <xs:attribute name="IgnoreCertificateErrors" type="xs:boolean" use="optional" />
+    <xs:attribute name="Description" type="xs:string" use="optional" />
   </xs:complexType>
   
   <xs:complexType name="VideoWebSocketType">
@@ -158,6 +162,7 @@
   
   <xs:complexType name="ParameterType">
     <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Optional" type="xs:boolean" use="optional" default="false"/>
     <xs:attribute name="ValueType" type="xs:string" use="optional"/>
   </xs:complexType>
   
@@ -192,12 +197,13 @@
     <xs:all>
       <xs:element name="HttpHeaders" type="HttpHeadersDictionaryType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="Querys" type="QuerysDictionaryType" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="Contents" type="ContentsDictionaryType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Contents" type="ContentsType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="Parameters" type="ParametersType" minOccurs="0" maxOccurs="1"/>
     </xs:all>
     <xs:attribute name="Name" type="xs:string" use="required"/>
     <xs:attribute name="Endpoint" type="xs:string" use="required"/>
     <xs:attribute name="HttpMethod" type="HttpRequestEnumType" use="required"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
     <!--Possibly need response type if stream doesnt auto close on reg. response.-->
     <xs:attribute name="HTTP_GenericLogEnabled" type="xs:boolean" use="required"/>
     <xs:attribute name="HTTP_HttpLogEnabled" type="xs:boolean" use="required"/>
@@ -215,6 +221,22 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="ContentsStringType">
+    <xs:attribute name="String" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ContentsBinaryType">
+    <xs:attribute name="BinaryBase64" type="xs:base64Binary" use="required"/>
+  </xs:complexType>
+  
+  <xs:complexType name="ContentsType">
+    <xs:choice minOccurs="1" maxOccurs="1">
+      <xs:element name="ContentDictionary" type="ContentsDictionaryType" minOccurs="1"/>
+      <xs:element name="ContentString" type="ContentsStringType" minOccurs="1"/>
+      <xs:element name="ContentBinary" type="ContentsBinaryType" minOccurs="1"/>
+    </xs:choice>
+  </xs:complexType>
+  
   <xs:complexType name="QuerysDictionaryType">
     <xs:sequence>
       <xs:element name="Query" type="KeyValuePairType" minOccurs="1" maxOccurs="unbounded"/>
@@ -224,6 +246,8 @@
   <xs:complexType name="KeyValuePairType">
     <xs:attribute name="Name" type="xs:string" use="required"/>
     <xs:attribute name="Value" type="xs:string" use="required"/>
+    <xs:attribute name="Optional" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
   </xs:complexType>
 
   

@@ -317,6 +317,8 @@ namespace PiKvmLibrary.Configuration {
         
         private bool ignoreCertificateErrorsFieldSpecified;
         
+        private string descriptionField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("HttpRequest", typeof(HttpEndpointType), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
         [System.Xml.Serialization.XmlElementAttribute("Websocket", typeof(WebSocketType), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
@@ -416,6 +418,17 @@ namespace PiKvmLibrary.Configuration {
                 this.ignoreCertificateErrorsFieldSpecified = value;
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Description {
+            get {
+                return this.descriptionField;
+            }
+            set {
+                this.descriptionField = value;
+            }
+        }
     }
     
     /// <remarks/>
@@ -430,7 +443,7 @@ namespace PiKvmLibrary.Configuration {
         
         private KeyValuePairType[] querysField;
         
-        private KeyValuePairType[] contentsField;
+        private ContentsType contentsField;
         
         private ParameterType[] parametersField;
         
@@ -439,6 +452,8 @@ namespace PiKvmLibrary.Configuration {
         private string endpointField;
         
         private HttpRequestEnumType httpMethodField;
+        
+        private string descriptionField;
         
         private bool hTTP_GenericLogEnabledField;
         
@@ -469,9 +484,8 @@ namespace PiKvmLibrary.Configuration {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Content", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=false)]
-        public KeyValuePairType[] Contents {
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ContentsType Contents {
             get {
                 return this.contentsField;
             }
@@ -527,6 +541,17 @@ namespace PiKvmLibrary.Configuration {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Description {
+            get {
+                return this.descriptionField;
+            }
+            set {
+                this.descriptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public bool HTTP_GenericLogEnabled {
             get {
                 return this.hTTP_GenericLogEnabledField;
@@ -560,6 +585,14 @@ namespace PiKvmLibrary.Configuration {
         
         private string valueField;
         
+        private bool optionalField;
+        
+        private string descriptionField;
+        
+        public KeyValuePairType() {
+            this.optionalField = false;
+        }
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string Name {
@@ -579,6 +612,29 @@ namespace PiKvmLibrary.Configuration {
             }
             set {
                 this.valueField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(false)]
+        public bool Optional {
+            get {
+                return this.optionalField;
+            }
+            set {
+                this.optionalField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Description {
+            get {
+                return this.descriptionField;
+            }
+            set {
+                this.descriptionField = value;
             }
         }
     }
@@ -786,7 +842,13 @@ namespace PiKvmLibrary.Configuration {
         
         private string nameField;
         
+        private bool optionalField;
+        
         private string valueTypeField;
+        
+        public ParameterType() {
+            this.optionalField = false;
+        }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -796,6 +858,18 @@ namespace PiKvmLibrary.Configuration {
             }
             set {
                 this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(false)]
+        public bool Optional {
+            get {
+                return this.optionalField;
+            }
+            set {
+                this.optionalField = value;
             }
         }
         
@@ -916,6 +990,96 @@ namespace PiKvmLibrary.Configuration {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.9037.0")]
     [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd")]
+    public partial class ContentsBinaryType {
+        
+        private byte[] binaryBase64Field;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType="base64Binary")]
+        public byte[] BinaryBase64 {
+            get {
+                return this.binaryBase64Field;
+            }
+            set {
+                this.binaryBase64Field = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd")]
+    public partial class ContentsStringType {
+        
+        private string stringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string String {
+            get {
+                return this.stringField;
+            }
+            set {
+                this.stringField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd")]
+    public partial class ContentsDictionaryType {
+        
+        private KeyValuePairType[] contentField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Content", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public KeyValuePairType[] Content {
+            get {
+                return this.contentField;
+            }
+            set {
+                this.contentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd")]
+    public partial class ContentsType {
+        
+        private object itemField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ContentBinary", typeof(ContentsBinaryType), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlElementAttribute("ContentDictionary", typeof(ContentsDictionaryType), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlElementAttribute("ContentString", typeof(ContentsStringType), Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public object Item {
+            get {
+                return this.itemField;
+            }
+            set {
+                this.itemField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.9037.0")]
+    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://PiKvmLibrary.local/PiKvmConnectionsConfigurationSchema.xsd")]
     public enum HttpRequestEnumType {
         
@@ -949,6 +1113,18 @@ namespace PiKvmLibrary.Configuration {
         
         /// <remarks/>
         Login_Endpoint,
+        
+        /// <remarks/>
+        Info_Endpoint,
+        
+        /// <remarks/>
+        PrintText_Endpoint,
+        
+        /// <remarks/>
+        SendKeyboardKey_Endpoint,
+        
+        /// <remarks/>
+        SendKeyboardMultiKeyPress_Endpoint,
         
         /// <remarks/>
         HidInformation_Endpoint,
@@ -985,8 +1161,5 @@ namespace PiKvmLibrary.Configuration {
         
         /// <remarks/>
         API_Endpoint,
-        
-        /// <remarks/>
-        MediaStream_Endpoint,
     }
 }

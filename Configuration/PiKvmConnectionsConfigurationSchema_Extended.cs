@@ -13,6 +13,7 @@ using System.Windows.Media.Animation;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Runtime.Remoting.Contexts;
 
 namespace PiKvmLibrary.Configuration
 {
@@ -180,11 +181,21 @@ namespace PiKvmLibrary.Configuration
 
                 if (httpRequest.Parameters != null)
                 {
+                    int requiredParameterCnt = httpRequest.Parameters.Count(p => p.Optional == false);
+                    int optionalParameterCnt = httpRequest.Parameters.Count(p => p.Optional == true);
+
+                    // Validate parameters count
+                    if (parameters.Length < requiredParameterCnt)
+                        throw new ArgumentException($"Expected at least {requiredParameterCnt} parameters, but received {parameters.Length}.");
+                    if (parameters.Length > requiredParameterCnt + optionalParameterCnt)
+                        throw new ArgumentException($"Expected at most {requiredParameterCnt + optionalParameterCnt} parameters, but received {parameters.Length}.");
+
+
                     parameterRequestType = httpRequest.Parameters.ToDictionary(kvp => kvp.Name, kvp => TypeSelector(kvp));
 
-                    // Validation parameters count are the same
-                    if (httpRequest.Parameters.Length != parameters.Length)
-                        throw new ArgumentException($"Expected {httpRequest.Parameters.Length} parameters, but received {parameters.Length}.");
+                    //// Validation parameters count are the same
+                    //if (httpRequest.Parameters.Length != parameters.Length)
+                    //    throw new ArgumentException($"Expected {httpRequest.Parameters.Length} parameters, but received {parameters.Length}.");
 
                     // Validate parameters types
                     for (int indx = 0; indx < parameters.Length; indx++)
@@ -213,6 +224,8 @@ namespace PiKvmLibrary.Configuration
                                     parameter = doubleValue;
                                 else if (expectedType == typeof(bool) && bool.TryParse(parameter.ToString(), out bool boolValue))
                                     parameter = boolValue;
+                                else if (expectedType == typeof(char) && char.TryParse(parameter.ToString(), out char charValue))
+                                    parameter = charValue;
                                 else
                                     throw new InvalidCastException($"Parameter '{httpParam.Name}' does not match expected type '{expectedType.Name}' for value '{parameter}'.");
                             }
@@ -235,13 +248,13 @@ namespace PiKvmLibrary.Configuration
 
                 Dictionary<string, string> sendHeaders = new Dictionary<string, string>();
                 Dictionary<string, string> sendQuerys = new Dictionary<string, string>();
-                Dictionary<string, string> sendContents = new Dictionary<string, string>();
+                HttpContent contents = null;
                 if (httpRequest.HttpHeaders != null)
                 {
                     //Process HttpHeaders
                     foreach (var header in httpRequest.HttpHeaders)
                     {
-                        sendHeaders.Add(Replaceariables(header.Name, parameterValues), Replaceariables(header.Value, parameterValues));
+                        sendHeaders.Add(ReplaceVariables(header.Name, parameterValues), ReplaceVariables(header.Value, parameterValues));
                     }
                 }
                 if (httpRequest.Querys != null)
@@ -249,15 +262,27 @@ namespace PiKvmLibrary.Configuration
                     //Process Queries
                     foreach (var query in httpRequest.Querys)
                     {
-                        sendQuerys.Add(Replaceariables(query.Name, parameterValues), Replaceariables(query.Value, parameterValues));
+                        sendQuerys.Add(ReplaceVariables(query.Name, parameterValues), ReplaceVariables(query.Value, parameterValues));
                     }
                 }
                 if (httpRequest.Contents != null)
                 {
-                    //Process Contents
-                    foreach (var content in httpRequest.Contents)
+                    if (httpRequest.Contents.Item is ContentsDictionaryType contentDict)
                     {
-                        sendContents.Add(Replaceariables(content.Name, parameterValues), Replaceariables(content.Value, parameterValues));
+                        Dictionary<string, string> sendContents = new Dictionary<string, string>();
+                        foreach (var content in contentDict.Content)
+                        {
+                            sendContents.Add(ReplaceVariables(content.Name, parameterValues), ReplaceVariables(content.Value, parameterValues));
+                        }
+                        contents = new FormUrlEncodedContent(sendContents);
+                    }
+                    else if (httpRequest.Contents.Item is ContentsStringType contentStrg)
+                    {
+                        contents = new StringContent(ReplaceVariables(contentStrg.String, parameterValues), Encoding.UTF8);
+                    }
+                    else if (httpRequest.Contents.Item is ContentsBinaryType contentBinary)
+                    {
+                        contents = new ByteArrayContent(contentBinary.BinaryBase64);
                     }
                 }
 
@@ -269,18 +294,16 @@ namespace PiKvmLibrary.Configuration
 
                 foreach (var query in sendQuerys)
                 {
-                    if (queryString.Contains("?"))
-                        queryString += $"&{query.Key}={query.Value}";
-                    else
-                        queryString += $"?{query.Key}={query.Value}";
+                    if (!(query.Value.StartsWith("{") && query.Value.EndsWith("}"))) // Variable not replaced so ignore it.
+                    {
+                        if (queryString.StartsWith("?"))
+                            queryString += $"&{query.Key}={query.Value}";
+                        else
+                            queryString += $"?{query.Key}={query.Value}";
+                    }
                 }
                 // endpoint string
                 string endpoint = httpRequest.Endpoint + queryString;
-
-                // set Contents
-                FormUrlEncodedContent contents = null;
-                if (sendContents.Count > 0)
-                    contents = new FormUrlEncodedContent(sendContents);
 
 
                 if (httpRequest.HttpMethod == HttpRequestEnumType.GET)
@@ -306,7 +329,7 @@ namespace PiKvmLibrary.Configuration
             }
         }
 
-        private static string Replaceariables(string value, Dictionary<string, string> variables)
+        private static string ReplaceVariables(string value, Dictionary<string, string> variables)
         {
             if (variables == null || variables.Count == 0)
                 return value;
@@ -333,6 +356,8 @@ namespace PiKvmLibrary.Configuration
                 return typeof(bool);
             else if (parameter.ValueType.ToLower() == "double")
                 return typeof(double);
+            else if (parameter.ValueType.ToLower() == "char")
+                return typeof(char);
             else
                 throw new NotSupportedException($"Unsupported parameter type: {parameter.ValueType}");
         }

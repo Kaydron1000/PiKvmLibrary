@@ -3,11 +3,13 @@
   <z:Connections Version="0.0" DefaultIgnoreCertificateErrors="true" EnableSingleQuoteJson="true" DefaultPasswordPromptHeader="X-KVMD-Passwd" DefaultUserNamePromptHeader="X-KVMD-User" DefaultPreferCookieAuthentication="true">
     <Connection BaseURI="https://192.168.1.183" Name="OriginalConnection">
       <Endpoints>
-        <Endpoint Name="Login_Endpoint" EndpointTimeout_Sec="10">
+        <Endpoint Name="Login_Endpoint" EndpointTimeout_Sec="10" Description="Gets the session-based cookie access token for the user session with valid credentials.">
           <HttpRequest Name="Login" Endpoint="api/auth/login" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
             <Contents>
-              <Content Name="user" Value="{USER}"/>
-              <Content Name="passwd" Value="{PASSWD}"/>
+              <ContentDictionary>
+                <Content Name="user" Value="{USER}" Description="Valid username to log into the kvmd web client."/>
+                <Content Name="passwd" Value="{PASSWD}" Description="Valid password associated with the username to log into the kvmd web client."/>
+              </ContentDictionary>
             </Contents>
             <Parameters>
               <Parameter Name="USER" ValueType="string"/>
@@ -15,6 +17,59 @@
             </Parameters>
           </HttpRequest>
         </Endpoint>
+        <Endpoint Name="Info_Endpoint" EndpointTimeout_Sec="10" Description="Returns the general information about the PiKVM device.">
+          <HttpRequest Name="Info" Endpoint="api/info" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="fields" Value="{FIELDS}" Description="Return only specified categories	auth, extras, fan, hw, meta, system "/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="FIELDS"  Optional="true"   ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="PrintText_Endpoint" EndpointTimeout_Sec="10" Description="Transmits user-defined text to emulate typing it on the PiKVM by sequencing key presses.">
+          <HttpRequest Name="PrintText" Endpoint="/api/hid/print" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Contents>
+              <ContentString String="{CONTENTSTRING}"/>
+            </Contents>
+            <Querys>
+              <Query Name="limit"   Value="{LIMIT}"   Optional="true"   Description="Maximum characters to process. 0 = no limit. Default: 1024"/>
+              <Query Name="keymap"  Value="{KEYMAP}"  Optional="true"   Description="Keymap to use (defaults to system default)."/>
+              <Query Name="slow"    Value="{SLOW}"    Optional="true"   Description="Enables slow typing mode (regular large intervals between key presses), false by default."/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="CONTENTSTRING"                   ValueType="string"/>
+              <Parameter Name="SLOW"          Optional="true"   ValueType="bool"/>
+              <Parameter Name="LIMIT"         Optional="true"   ValueType="integer"/>
+              <Parameter Name="KEYMAP"        Optional="true"   ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="SendKeyboardKey_Endpoint" EndpointTimeout_Sec="10" Description="Transmits a command to emulate a single key press on the PiKVM.">
+          <HttpRequest Name="SendKeyboardKey" Endpoint="/api/hid/events/send_key" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="key"     Value="{KEY}"                       Description="Key identifier to send. Expected Value Key{LETTER} or Digit{NUMBER}. Other valid identifiers, 'Enter', 'Escape', 'Backspace', 'Tab', 'ControlLeft' 'AltLeft' 'Delete'"/>
+              <Query Name="state"   Value="{STATE}"   Optional="true"   Description="Key state: true(1) for press, false(0) for release. If state is not used the key will be stroked up and down for a single press."/>
+              <Query Name="finish"  Value="{FINISH}"  Optional="true"   Description="Releases non-modifier keys right after pressing them so that they don't get stuck when the connection is not stable. Must use state to use finish. Defaults to false."/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="KEY"                       ValueType="string"/>
+              <Parameter Name="STATE"   Optional="true"   ValueType="bool"/>
+              <Parameter Name="FINISH"  Optional="true"   ValueType="bool"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+        <Endpoint Name="SendKeyboardMultiKeyPress_Endpoint" EndpointTimeout_Sec="10" Description="Sends a keyboard shortcut, or key combination, to be typed on the PiKVM. Expected Value Key{LETTER} or Digit{NUMBER}. Other valid identifiers, 'Enter', 'Escape', 'Backspace', 'Tab', 'ControlLeft' 'AltLeft' 'Delete'">
+          <HttpRequest Name="SendKeyboardMultiKeyPress" Endpoint="/api/hid/events/send_shortcut" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
+            <Querys>
+              <Query Name="keys" Value="{KEYS}" Description="Comma-separated list of key names."/>
+            </Querys>
+            <Parameters>
+              <Parameter Name="KEYS" ValueType="string"/>
+            </Parameters>
+          </HttpRequest>
+        </Endpoint>
+
         <Endpoint Name="HidInformation_Endpoint" EndpointTimeout_Sec="10">
           <HttpRequest Name="HidInformation" Endpoint="api/hid" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
           </HttpRequest>

@@ -7,6 +7,7 @@ using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -131,15 +132,144 @@ namespace PiKvmLibrary
         //    return null;
         //}
 
+        /// <summary>
+        /// Send a full string of text to PiKVM to be printed as if it was typed on the keyboard.
+        /// </summary>
+        /// <param name="inputText">String to send to PiKVM.</param>
+        /// <param name="slow"><c>true</c> to send each character with longer pause between each keystroke, <c>false</c> by default.</param>
+        /// <param name="limit">Limits number of characters being sent by call. 0 to have no limit, default limit is 1024.</param>
+        /// <param name="keymap">Keymap specifies keyboard layout/language for Keys, defaults to system default.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void SendPrintText(string inputText, bool? slow = null, int? limit = null, string keymap = null)
+        {
+            EndpointType keyboardInput = _Connection.GetEndpoint(StandardEndpointsEnumType.PrintText_Endpoint);
+            if (keyboardInput != null)
+            {
+                if      (slow == null && limit == null && keymap == null)
+                    keyboardInput.SendEndpoint(new object[] { inputText }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                else if (limit == null && keymap == null)
+                    keyboardInput.SendEndpoint(new object[] { inputText, slow }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                else if (keymap == null)
+                    keyboardInput.SendEndpoint(new object[] { inputText, slow, limit }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                else
+                    keyboardInput.SendEndpoint(new object[] { inputText, slow, limit, keymap }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            else
+            {
+                throw new ArgumentException("Keyboard input endpoint not found.");
+            }
+        }
+        /// <summary>
+        /// Sends a single character to PiKVM as if it was typed on the keyboard.
+        /// </summary>
+        /// <param name="inputCharacter">Single character to send to PiKVM.</param>
+        /// <param name="state"><c>true</c>, to hold key in the down position. <c>false</c>, to release key to the up position.</param>
+        /// <param name="finish">Releases non-modifier keys right after pressing them so that they don't get stuck when the connection is not stable. Defaults to false.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void SendKeyboardKey(char inputCharacter, bool? state = null, bool? finish = null)
+        {
+            EndpointType keyboardInput = _Connection.GetEndpoint(StandardEndpointsEnumType.SendKeyboardKey_Endpoint);
+            string specialCharArray = "!@#$%^&*()_+{}|:\"<>?~";
+            if (keyboardInput != null)
+            {
+                if (char.IsLower(inputCharacter) || char.IsDigit(inputCharacter))
+                {
+                    string inputText = inputCharacter.CharToWebNameKey();
+                    if (state == null && finish == null)
+                        keyboardInput.SendEndpoint(new object[] { inputText }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                    if (finish == null)
+                        keyboardInput.SendEndpoint(new object[] { inputText, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                    else
+                        keyboardInput.SendEndpoint(new object[] { inputText, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else if (char.IsUpper(inputCharacter) || specialCharArray.Contains(inputCharacter))
+                { 
+                    string inputText = inputCharacter.CharToWebNameKey();
+                    if (state == null && finish == null)
+                    {
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { inputText }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                    if (finish == null)
+                    {
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { inputText, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { inputText, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                }
+                else if (Regex.Unescape("\\n") == inputCharacter.ToString() || Regex.Unescape("\\r") == inputCharacter.ToString() || inputCharacter == '\n' || inputCharacter == '\r')
+                {
+                    keyboardInput.SendEndpoint(new object[] { "Enter" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else if (inputCharacter == ' ')
+                {
+                    keyboardInput.SendEndpoint(new object[] { "Space" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else if (inputCharacter == '\t')
+                {
+                    keyboardInput.SendEndpoint(new object[] { "Tab" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else if (inputCharacter == '\b' || inputCharacter == '\x7f' || inputCharacter == '\x08')
+                {
+                    keyboardInput.SendEndpoint(new object[] { "Backspace" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    throw new ArgumentException($"Invalid character specified cannot process character '{inputCharacter}'.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Keyboard input endpoint not found.");
+            }
+        }
+        /// <summary>
+        /// Sends a keyboard shortcut, or key combination, to be typed on the PiKVM. Expected Value Key{LETTER} or Digit{NUMBER}. Other valid identifiers, 'Enter', 'Escape', 'Backspace', 'Tab', 'ControlLeft' 'AltLeft' 'Delete'
+        /// </summary>
+        /// <param name="keyNames">Each key name for each parameter.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void SendKeyboardMultiKey(string[] keyNames)
+        {
+            EndpointType keyboardInput = _Connection.GetEndpoint(StandardEndpointsEnumType.SendKeyboardMultiKeyPress_Endpoint);
+            if (keyboardInput != null)
+            {
+                object[] objects = new object[] { String.Join(",", keyNames) };
+                keyboardInput.SendEndpoint(objects, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            else
+            {
+                throw new ArgumentException("Keyboard input endpoint not found.");
+            }
+        }
         public void SetMouseMode(MouseOutputType outputType)
         {
             EndpointType mouseType = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseOutputType_Endpoint);
             mouseType.SendEndpoint(new object[] { outputType.ToString() }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
+        /// <summary>
+        /// Moves mouse based on the specified mouse mode and position.
+        /// </summary>
+        /// <param name="mouseMode">Relative movement or absolute movement</param>
+        /// <param name="xPos">X position to move mouse.</param>
+        /// <param name="yPos">Y position to move mouse.</param>
         public void MoveMouse(MouseMode mouseMode, int xPos, int yPos)
         {
             MoveMouse(mouseMode, (double)xPos, (double)yPos);
         }
+        /// <summary>
+        /// Moves mouse based on the specified mouse mode and position.
+        /// </summary>
+        /// <param name="mouseMode">Relative movement or absolute movement</param>
+        /// <param name="xPos">X position to move mouse.</param>
+        /// <param name="yPos">Y position to move mouse.</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void MoveMouse(MouseMode mouseMode, double xPos, double yPos)
         {
             if (mouseMode == MouseMode.Absolute)
@@ -164,12 +294,21 @@ namespace PiKvmLibrary
             }
             // remap (xvalue-xResMin, 0, xResMax-1,-32768, 32767)
         }
+        /// <summary>
+        /// Click mouse button using PiKVM. This is a down and up action.
+        /// </summary>
+        /// <param name="mouseButton">Left, Right, or Middle click.</param>
         public void MouseClick(MouseButton mouseButton)
         {
             EndpointType MouseButton;
             MouseButton = _Connection.GetEndpoint(StandardEndpointsEnumType.MouseButton_Endpoint);
             MouseButton.SendEndpoint(new[] { mouseButton.ToString() }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
+        /// <summary>
+        /// Sets the state of a mouse button, either pressed or released.
+        /// </summary>
+        /// <param name="mouseButton">Left, Right, or Middle button.</param>
+        /// <param name="state"><c>true</c> for pressed and <c>false</c> for released.</param>
         public void MouseClickState(MouseButton mouseButton, bool state)
         {
             EndpointType MouseButton;
