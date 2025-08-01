@@ -64,6 +64,12 @@ namespace PiKvmLibrary
             Abs_RemapX = (x) => Remap(x, 0, _Resolution.Width, -32768, 32767);
             Abs_RemapY = (y) => Remap(y, 0, _Resolution.Height, -32768, 32767);
         }
+        /// <summary>
+        /// Initializes communication to PiKVM using the specified URI, username, and password.
+        /// </summary>
+        /// <param name="uri">Path to connect to PiKVM.</param>
+        /// <param name="username">Username to log into PiKVM.</param>
+        /// <param name="password">Password to log into PiKVM.</param>
         public void InitializeCommunication(string uri, string username, string password)
         {
             _Connection.BaseURI = uri;
@@ -97,6 +103,12 @@ namespace PiKvmLibrary
                 Height = height
             };
         }
+        /// <summary>
+        /// Generic request to PiKVM using the specified request name and parameters.
+        /// </summary>
+        /// <param name="requestName">The name of the endpoint to retrieve from configuration to call command.</param>
+        /// <param name="parameters">Parameters to send to command.</param>
+        /// <exception cref="ArgumentException"></exception>
         public void GenericRequest(string requestName, object[] parameters = null)
         {
             EndpointType endpoint = _Connection.GetCommand_HttpType(requestName);
@@ -157,6 +169,36 @@ namespace PiKvmLibrary
             else
             {
                 throw new ArgumentException("Keyboard input endpoint not found.");
+            }
+        }
+        /// <summary>
+        /// Sends a single keyboard key to PiKVM as if it was typed on the keyboard. Single character or the web_name 
+        /// key from the keymap.csv file (https://github.com/pikvm/kvmd/blob/master/keymap.csv).
+        /// </summary>
+        /// <param name="inputStringKey">Single chatacter or web_name key can be sent see: https://github.com/pikvm/kvmd/blob/master/keymap.csv</param>
+        /// <param name="state"><c>true</c>, to hold key in the down position. <c>false</c>, to release key to the up position. Defaults to a striking state (push and release key in single command).</param>
+        /// <param name="finish">Releases non-modifier keys right after pressing them so that they don't get stuck when the connection is not stable. Defaults to false.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void SendKeyboardKey(string inputStringKey, bool? state = null, bool? finish = null)
+        {
+            if (inputStringKey.Length == 1)
+                SendKeyboardKey(inputStringKey[0], state, finish);
+            else
+            {
+                EndpointType keyboardInput = _Connection.GetEndpoint(StandardEndpointsEnumType.SendKeyboardKey_Endpoint);
+                if (keyboardInput != null)
+                {
+                    if (state == null && finish == null)
+                        keyboardInput.SendEndpoint(new object[] { inputStringKey }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                    else if (finish == null)
+                        keyboardInput.SendEndpoint(new object[] { inputStringKey, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                    else
+                        keyboardInput.SendEndpoint(new object[] { inputStringKey, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    throw new ArgumentException("Keyboard input endpoint not found.");
+                }
             }
         }
         /// <summary>
