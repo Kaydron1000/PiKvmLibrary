@@ -17,6 +17,13 @@
             </Parameters>
           </HttpRequest>
         </Endpoint>
+        <Endpoint Name="Logout_Endpoint" EndpointTimeout_Sec="10" Description="Logs out the user session and invalidates the session-based cookie access token.">
+          <HttpRequest Name="Logout" Endpoint="api/auth/logout" HttpMethod="POST" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false"/>
+        </Endpoint>
+        <Endpoint Name="CheckAuth_Endpoint" EndpointTimeout_Sec="10" Description="Returns the current user session is valid.">
+          <HttpRequest Name="CheckAuth" Endpoint="api/auth/check" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false"/>
+        </Endpoint>
+        
         <Endpoint Name="Info_Endpoint" EndpointTimeout_Sec="10" Description="Returns the general information about the PiKVM device.">
           <HttpRequest Name="Info" Endpoint="api/info" HttpMethod="GET" HTTP_GenericLogEnabled="true" HTTP_HttpLogEnabled="false">
             <Querys>

@@ -99,6 +99,28 @@ namespace PiKvmLibrary.Configuration
                 throw new NotSupportedException($"Unsupported endpoint type: {loginEndpoint.Item.GetType().Name}");
             }
         }
+        //public void ClearCredentials()
+        //{
+        //    if (Endpoints != null && Endpoints.Length > 0)
+        //    {
+        //        foreach (var endpoint in Endpoints)
+        //        {
+        //            var endpointObj = endpoint.GetEndpointObject();
+        //            if (endpointObj is GenericHttpRequest httpRequest)
+        //            {
+        //                httpRequest.ClearCredentials();
+        //            }
+        //            else if (endpointObj is GenericWebsocket websocket)
+        //            {
+        //                websocket.ClearCredentials();
+        //            }
+        //            else
+        //            {
+        //                throw new NotSupportedException($"Unsupported endpoint type: {endpoint.Item.GetType().Name}");
+        //            }
+        //        }
+        //    }
+        //}
 
         public EndpointType GetEndpoint(StandardEndpointsEnumType endpointType)
         {

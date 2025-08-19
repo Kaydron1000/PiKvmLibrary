@@ -1115,6 +1115,12 @@ namespace PiKvmLibrary.Configuration {
         Login_Endpoint,
         
         /// <remarks/>
+        Logout_Endpoint,
+        
+        /// <remarks/>
+        CheckAuth_Endpoint,
+        
+        /// <remarks/>
         Info_Endpoint,
         
         /// <remarks/>

@@ -10,6 +10,8 @@
   <xs:simpleType name="StandardEndpointsEnumType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Login_Endpoint"/>
+      <xs:enumeration value="Logout_Endpoint"/>
+      <xs:enumeration value="CheckAuth_Endpoint"/>
       <xs:enumeration value="Info_Endpoint"/>
       <xs:enumeration value="PrintText_Endpoint"/>
       <xs:enumeration value="SendKeyboardKey_Endpoint"/>

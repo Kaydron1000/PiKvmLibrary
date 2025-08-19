@@ -23,6 +23,7 @@ namespace PiKvmLibrary
 {
     public class GenericHttpRequest
     {
+        #region Private Fields
         private HttpClient _Client;
         private HttpClientHandler _ClientHandler;
         private CookieContainer _CookieContainer;
@@ -32,9 +33,14 @@ namespace PiKvmLibrary
         private ConnectionType _ConnectionConfiguration;
         private EndpointType _EndPointConfiguration;
         private HttpEndpointType _HttpRequestConfiguration;
+        #endregion
 
+        #region Public Events
         public event EventHandler<LogMessage> OnLogEvent;
         public event EventHandler<string> OnHttpMessageEvent;
+        #endregion
+
+        #region Constructors
         public GenericHttpRequest()
         {
             _Cts_ReadingLog = new CancellationTokenSource();
@@ -51,6 +57,9 @@ namespace PiKvmLibrary
         {
             Initialize(connectionConfiguration, endpointConfiguration);
         }
+        #endregion
+
+        #region Public Functions
         public void Initialize(ConnectionType connection, EndpointType endpointConfiguration)
         {
             if (connection == null || endpointConfiguration?.Item == null)
@@ -130,9 +139,18 @@ namespace PiKvmLibrary
 
         private void SetAuthCookies(CookieCollection cookies)
         {
+            if (_ClientHandler.CookieContainer.Capacity < cookies.Count)
+                _ClientHandler.CookieContainer.Capacity += cookies.Count;
             foreach (Cookie cookie in cookies)
                 _ClientHandler.CookieContainer.Add(cookie);
         }
+        //public void ClearCredentials()
+        //{
+        //    // Clear the cookies from the CookieContainer
+        //    _ClientHandler.CookieContainer.Capacity = 0; // This effectively clears the cookies
+        //    _Client.DefaultRequestHeaders.Clear(); // Clear any default headers set for authentication
+        //    PushLogEvent(new LogMessage() { LogLevel = LogLevel.Information, Message = "Credentials cleared.", TimeStamp = DateTime.Now });
+        //}
 
         public CookieCollection GetAuthCookies()
         {
@@ -211,6 +229,7 @@ namespace PiKvmLibrary
                 onLog?.Invoke(new LogMessage() { LogLevel = LogLevel.Error, Exception = ex, Message = $"Exception during Post request to {url}", TimeStamp = DateTime.Now });
             }
         }
+        #endregion
 
         private async Task ReadResult(HttpResponseMessage response, Action<string> onHttpMessage, Action<LogMessage> onLog)
         {

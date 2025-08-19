@@ -123,6 +123,11 @@ namespace PiKvmLibrary
 
             _ClientWSS.Options.SetRequestHeader("Cookie", _ClientWSS.Options.Cookies.GetCookieHeader(_WsUri));
         }
+        //public void ClearCredentials()
+        //{
+        //    // Clear the cookies from the CookieContainer
+        //    _ClientWSS.Options.Cookies = new CookieContainer();
+        //}
         public async Task<bool> Connect()
         {
             Task<bool> connectWss = ConnectAsync();

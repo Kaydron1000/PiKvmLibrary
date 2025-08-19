@@ -95,6 +95,18 @@ namespace PiKvmLibrary
 
             _Connection.SetCredentials(login);
         }
+        /// <summary>
+        /// Closes current communication with PiKVM and logs out from the session. This will close the connection to PiKVM.
+        /// </summary>
+        public void TerminateCommunication()
+        {
+            EndpointType logout = _Connection.GetEndpoint(StandardEndpointsEnumType.Logout_Endpoint);
+            if (logout != null)
+            {
+                logout.SendEndpoint(null, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                //_Connection.ClearCredentials();
+            }
+        }
         public void SetResolution(int width, int height)
         {
             _Resolution = new Resolution
@@ -190,7 +202,7 @@ namespace PiKvmLibrary
                 {
                     if (state == null && finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputStringKey }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                    else if (finish == null)
+                     if (finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputStringKey, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     else
                         keyboardInput.SendEndpoint(new object[] { inputStringKey, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -212,14 +224,15 @@ namespace PiKvmLibrary
         {
             EndpointType keyboardInput = _Connection.GetEndpoint(StandardEndpointsEnumType.SendKeyboardKey_Endpoint);
             string specialCharArray = "!@#$%^&*()_+{}|:\"<>?~";
+            string specialCharArray2 = " \t-=[]\\;\',./`";
             if (keyboardInput != null)
             {
-                if (char.IsLower(inputCharacter) || char.IsDigit(inputCharacter))
+                if (char.IsLower(inputCharacter) || char.IsDigit(inputCharacter) || specialCharArray2.Contains(inputCharacter))
                 {
                     string inputText = inputCharacter.CharToWebNameKey();
                     if (state == null && finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputText }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                    if (finish == null)
+                    else if (finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputText, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     else
                         keyboardInput.SendEndpoint(new object[] { inputText, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -229,38 +242,34 @@ namespace PiKvmLibrary
                     string inputText = inputCharacter.CharToWebNameKey();
                     if (state == null && finish == null)
                     {
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                         keyboardInput.SendEndpoint(new object[] { inputText }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     }
-                    if (finish == null)
+                    else if (finish == null)
                     {
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                         keyboardInput.SendEndpoint(new object[] { inputText, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     else
                     {
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", true, false }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                         keyboardInput.SendEndpoint(new object[] { inputText, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }).ConfigureAwait(false).GetAwaiter().GetResult();
+                        keyboardInput.SendEndpoint(new object[] { "ShiftLeft", false, true }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                 }
                 else if (Regex.Unescape("\\n") == inputCharacter.ToString() || Regex.Unescape("\\r") == inputCharacter.ToString() || inputCharacter == '\n' || inputCharacter == '\r')
                 {
                     keyboardInput.SendEndpoint(new object[] { "Enter" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
-                else if (inputCharacter == ' ')
-                {
-                    keyboardInput.SendEndpoint(new object[] { "Space" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-                else if (inputCharacter == '\t')
-                {
-                    keyboardInput.SendEndpoint(new object[] { "Tab" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                }
-                else if (inputCharacter == '\b' || inputCharacter == '\x7f' || inputCharacter == '\x08')
+                else if (inputCharacter == '\b' || inputCharacter == '\x08')
                 {
                     keyboardInput.SendEndpoint(new object[] { "Backspace" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else if (inputCharacter == (char)127)
+                {
+                    keyboardInput.SendEndpoint(new object[] { "Delete" }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
                 else
                 {
