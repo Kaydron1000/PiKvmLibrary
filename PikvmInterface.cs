@@ -202,7 +202,7 @@ namespace PiKvmLibrary
                 {
                     if (state == null && finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputStringKey }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-                     if (finish == null)
+                    else if (finish == null)
                         keyboardInput.SendEndpoint(new object[] { inputStringKey, state }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
                     else
                         keyboardInput.SendEndpoint(new object[] { inputStringKey, state, finish }, OnHttpMessage, OnLogMessage).ConfigureAwait(false).GetAwaiter().GetResult();
